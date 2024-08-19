@@ -1,0 +1,15 @@
+/eleventy/assets/vendor/
+/eleventy/layouts
+/eleventy/public
+/eleventy/_site
+/eleventy/resources
+/eleventy/static/.htaccess
+/eleventy/static/vendor
+/eleventy/themes
+/scripts/videos/input/
+/scripts/videos/output/
+/scripts/images/input/
+/scripts/images/output/
+/packages/vendors/packages/
+package-lock.json
+.yarn

@@ -1,0 +1,54 @@
+{
+  "name": "node-currency",
+  "version": "0.0.1",
+  "private": true,
+  "description": "",
+  "homepage": "https://github.com/zdrazil/node-currency#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zdrazil/node-currency"
+  },
+  "license": "UNLICENSED",
+  "author": "Vladimir Zdrazil",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx --watch src/index.ts",
+    "generate:videos": "tsx src/videos/generateVideos.ts",
+    "lint": "concurrently --group \"npm:lint:*\"",
+    "lint:eslint": "eslint --cache \"$INIT_CWD/src/**/*.ts\" --fix",
+    "lint:ts": "tsc --noEmit --incremental",
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "fastify": "4.28.1"
+  },
+  "devDependencies": {
+    "@eslint/compat": "1.1.0",
+    "@eslint/js": "9.6.0",
+    "@ianvs/prettier-plugin-sort-imports": "4.3.0",
+    "@types/eslint-config-prettier": "6.11.3",
+    "@types/eslint__js": "8.42.3",
+    "@types/node": "20.14.10",
+    "@typescript-eslint/parser": "7.16.0",
+    "concurrently": "8.2.2",
+    "eslint": "9.6.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-sort-destructure-keys": "2.0.0",
+    "eslint-plugin-sort-keys-fix": "1.1.2",
+    "eslint-plugin-typescript-sort-keys": "3.2.0",
+    "globals": "15.8.0",
+    "prettier": "3.3.2",
+    "prettier-plugin-css-order": "2.1.2",
+    "prettier-plugin-jsdoc": "1.3.0",
+    "prettier-plugin-packagejson": "2.5.0",
+    "tsx": "4.16.2",
+    "typescript": "5.5.3",
+    "typescript-eslint": "7.16.0"
+  },
+  "packageManager": "yarn@4.3.1",
+  "engines": {
+    "node": ">=20"
+  }
+}
