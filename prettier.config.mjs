@@ -7,7 +7,6 @@ const config = {
   cssDeclarationSorterOrder: 'alphabetical',
   htmlWhitespaceSensitivity: 'strict',
   plugins: [
-    'prettier-plugin-css-order',
     '@ianvs/prettier-plugin-sort-imports',
     'prettier-plugin-jsdoc',
     'prettier-plugin-packagejson',

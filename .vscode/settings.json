@@ -1,0 +1,22 @@
+{
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.prettier": "explicit"
+  },
+  "eslint.quiet": true,
+  "zenMode.fullScreen": false,
+  "jestrunner.debugOptions": {
+    "args": [
+      "--watch"
+      //  "--no-cache" If debugger points to wrong lines, try this
+    ],
+    "env": {
+      "NODE_OPTIONS": "--import tsx"
+    }
+  },
+  "search.exclude": {
+    ".yarn/releases/**/*": true
+  }
+}

@@ -1,7 +1,8 @@
-
 import { fixupPluginRules } from '@eslint/compat';
 import eslint from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier';
+// @ts-expect-error
+import jest from 'eslint-plugin-jest';
 import sortDestructureKeys from 'eslint-plugin-sort-destructure-keys';
 import sortKeys from 'eslint-plugin-sort-keys-fix';
 import sortTSKeys from 'eslint-plugin-typescript-sort-keys';
@@ -61,6 +62,7 @@ export default tseslint.config(
         },
       ],
       '@typescript-eslint/no-var-requires': 'off',
+      '@typescript-eslint/require-await': 'off',
       '@typescript-eslint/strict-boolean-expressions': [
         'error',
         {
@@ -92,6 +94,12 @@ export default tseslint.config(
         { caseSensitive: false },
       ],
     },
+  },
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  {
+    files: ['**/*.spec.{js,ts,mjs}'],
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    ...jest.configs['flat/recommended'],
   },
   eslintConfigPrettier,
 );
