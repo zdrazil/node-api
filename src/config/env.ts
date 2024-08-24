@@ -1,33 +1,28 @@
 import { Static, Type } from '@sinclair/typebox';
 import envSchema from 'env-schema';
 
-const NodeEnvSchema = Type.Union([
-  Type.Literal('development'),
-  Type.Literal('production'),
-  Type.Literal('test'),
-]);
+export const NodeEnv = {
+  development: 'development',
+  production: 'production',
+  test: 'test',
+} as const;
 
-export type NodeEnv = Static<typeof NodeEnvSchema>;
-
-const LogLevelSchema = Type.Union([
-  Type.Literal('error'),
-  Type.Literal('warn'),
-  Type.Literal('info'),
-  Type.Literal('debug'),
-]);
-
-export type LogLevel = Static<typeof LogLevelSchema>;
+export const LogLevel = {
+  debug: 'debug',
+  error: 'error',
+  info: 'info',
+  warn: 'warn',
+} as const;
 
 const schema = Type.Object({
   HOST: Type.String({ default: 'localhost' }),
-  LOG_LEVEL: LogLevelSchema,
-  NODE_ENV: NodeEnvSchema,
+  LOG_LEVEL: Type.Enum(LogLevel),
+  NODE_ENV: Type.Enum(NodeEnv),
   PORT: Type.Number({ default: 3000 }),
-  // TODO: Use when I have db.
-  // POSTGRES_DB: Type.String(),
-  // POSTGRES_PASSWORD: Type.String(),
-  // POSTGRES_URL: Type.String(),
-  // POSTGRES_USER: Type.String(),
+  POSTGRES_DB: Type.String(),
+  POSTGRES_PASSWORD: Type.String(),
+  POSTGRES_URL: Type.String(),
+  POSTGRES_USER: Type.String(),
 });
 
 const internalEnv = envSchema<Static<typeof schema>>({
@@ -36,8 +31,8 @@ const internalEnv = envSchema<Static<typeof schema>>({
 });
 
 export const env = {
-  isDevelopment: internalEnv.NODE_ENV === NodeEnvSchema.development,
-  isProduction: internalEnv.NODE_ENV === NodeEnvSchema.production,
+  isDevelopment: internalEnv.NODE_ENV === NodeEnv.development,
+  isProduction: internalEnv.NODE_ENV === NodeEnv.production,
   log: {
     level: internalEnv.LOG_LEVEL,
   },
@@ -47,4 +42,7 @@ export const env = {
     port: internalEnv.PORT,
   },
   version: process.env.npm_package_version ?? '0.0.0',
+  db: {
+    url: `postgres://${internalEnv.POSTGRES_USER}:${internalEnv.POSTGRES_PASSWORD}@${internalEnv.POSTGRES_URL}/${internalEnv.POSTGRES_DB}?sslmode=disable`,
+  },
 };

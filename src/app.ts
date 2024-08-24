@@ -26,10 +26,7 @@ async function init() {
 
   await server(fastify);
 
-  // TODO: enable after adding db
-  const gracefulServer = GracefulServer(fastify.server, {
-    // closePromises: [closeDbConnection],
-  });
+  const gracefulServer = GracefulServer(fastify.server);
 
   gracefulServer.on(GracefulServer.READY, () => {
     fastify.log.info('Server is ready');

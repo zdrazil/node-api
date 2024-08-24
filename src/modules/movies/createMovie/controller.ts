@@ -6,9 +6,14 @@ import { createIdDtoSchema } from '../../api/id';
 import { ConflictException } from '../../exceptions/exceptions';
 import { movieEndpoints } from '../endpoints';
 import { MovieAlreadyExistsError } from '../errors';
-import service from './service';
+import { Movie } from '../models';
+import { createRepository } from './repository';
+import { createService } from './service';
 
 export default async function createMovie(fastify: FastifyRouteInstance) {
+  const repository = createRepository({ db: fastify.pg });
+  const service = createService({ movieRepository: repository });
+
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     // constraints: {
     //   version: '1',
@@ -40,10 +45,13 @@ export default async function createMovie(fastify: FastifyRouteInstance) {
   });
 }
 
-function mapToMovie({ genres, title, year }: CreateMovieRequestDto) {
+function mapToMovie({ genres, title, year }: CreateMovieRequestDto): Movie {
+  const sluggedTitle = title.toLowerCase().replace(/ /g, '-');
+
   return {
     genres,
     id: randomUUID(),
+    slug: sluggedTitle,
     title,
     yearOfRelease: year,
   };

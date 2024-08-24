@@ -9,6 +9,7 @@ const config = {
   plugins: [
     '@ianvs/prettier-plugin-sort-imports',
     'prettier-plugin-jsdoc',
+    'prettier-plugin-sql',
     'prettier-plugin-packagejson',
   ],
   proseWrap: 'never',

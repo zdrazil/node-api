@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import AutoLoad from '@fastify/autoload';
 import Cors from '@fastify/cors';
 import Helmet from '@fastify/helmet';
+import fastifyPostgres from '@fastify/postgres';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import UnderPressure from '@fastify/under-pressure';
 import { FastifyInstance } from 'fastify';
@@ -21,6 +22,10 @@ export default async function createServer(fastify: FastifyInstance) {
 
   await fastify.register(Cors, {
     origin: false,
+  });
+
+  await fastify.register(fastifyPostgres, {
+    connectionString: env.db.url,
   });
 
   await fastify.register(AutoLoad, {
