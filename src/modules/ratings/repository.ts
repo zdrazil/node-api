@@ -65,7 +65,7 @@ export function createRatingRepository({ db }: { db: PostgresDb }) {
     return rating.rows[0]?.rating ?? 0;
   }
 
-  async function createRating({
+  async function rateMovie({
     movieId,
     userId,
     rating,
@@ -149,7 +149,7 @@ export function createRatingRepository({ db }: { db: PostgresDb }) {
   return {
     getRatingByMovieId,
     getRatingByMovieAndUserId,
-    createRating,
+    rateMovie,
     deleteRating,
     getRatingsForUser,
   };

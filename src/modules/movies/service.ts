@@ -15,5 +15,20 @@ export const createMovieService = ({
 
   const getById = movieRepository.getById;
 
-  return { create, getById };
+  const getBySlug = movieRepository.getBySlug;
+
+  const update = movieRepository.update;
+
+  const deleteById = movieRepository.deleteById;
+
+  const getCount = movieRepository.getCount;
+
+  return {
+    create,
+    getById,
+    getBySlug,
+    update,
+    deleteById,
+    getCount,
+  };
 };
