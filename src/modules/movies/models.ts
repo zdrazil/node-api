@@ -4,4 +4,6 @@ export interface Movie {
   slug: string;
   title: string;
   yearOfRelease: number;
+  rating?: number;
+  userRating?: number;
 }

@@ -1,17 +1,19 @@
 import { Movie } from './models';
-import { Repository } from './repository';
+import { MovieRepository } from './repository';
 
-export type Service = ReturnType<typeof createService>;
+export type MovieService = ReturnType<typeof createMovieService>;
 
-export const createService = ({
+export const createMovieService = ({
   movieRepository,
 }: {
-  movieRepository: Repository;
+  movieRepository: MovieRepository;
 }) => {
-  const createMovie = async (movie: Movie): Promise<boolean> => {
+  async function create(movie: Movie): Promise<boolean> {
     // await movieValidator.ValidateAndThrowAsync(movie, cancellationToken);
-    return movieRepository.createMovie(movie);
-  };
+    return movieRepository.create(movie);
+  }
 
-  return { createMovie };
+  const getById = movieRepository.getById;
+
+  return { create, getById };
 };
