@@ -2,7 +2,7 @@ const sqlSettings = {
   embeddedSqlTags: ['sql'],
   keywordCase: 'upper',
   dataTypeCase: 'upper',
-  functionCase: 'upper',
+  functionCase: 'lower',
   expressionWidth: 150,
   language: 'postgresql',
 };
