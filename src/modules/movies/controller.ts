@@ -1,19 +1,22 @@
 import { randomUUID } from 'node:crypto';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { Static, Type } from '@sinclair/typebox';
-import { FastifyRouteInstance } from '../../../types';
-import { createIdDtoSchema } from '../../api/id';
-import { ConflictException } from '../../exceptions/exceptions';
-import { movieEndpoints } from '../endpoints';
-import { MovieAlreadyExistsError } from '../errors';
-import { Movie } from '../models';
-import { createRepository } from './repository';
-import { createService } from './service';
+import { FastifyRouteInstance } from '../../types';
+import { createIdDtoSchema } from '../api/id';
+import { ConflictException } from '../exceptions/exceptions';
+import { movieEndpoints } from './endpoints';
+import { MovieAlreadyExistsError } from './errors';
+import { Movie } from './models';
+import { Service } from './service';
 
-export default async function createMovie(fastify: FastifyRouteInstance) {
-  const repository = createRepository({ db: fastify.pg });
-  const service = createService({ movieRepository: repository });
+interface Dependencies {
+  service: Service;
+}
 
+export async function createController(
+  fastify: FastifyRouteInstance,
+  { service }: Dependencies,
+) {
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     // constraints: {
     //   version: '1',
@@ -38,7 +41,6 @@ export default async function createMovie(fastify: FastifyRouteInstance) {
       response: {
         200: createIdDtoSchema('Movie'),
       },
-
       tags: ['movies'],
     },
     url: movieEndpoints.create,

@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import GracefulServer from '@gquittet/graceful-server';
 import Fastify from 'fastify';
 import { env } from './config/env';
-import server from './server/server';
+import { createServer } from './server/server';
 
 async function init() {
   const fastify = Fastify({
@@ -24,7 +24,7 @@ async function init() {
     },
   });
 
-  await server(fastify);
+  await createServer(fastify);
 
   const gracefulServer = GracefulServer(fastify.server);
 

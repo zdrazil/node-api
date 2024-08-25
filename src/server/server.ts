@@ -13,7 +13,7 @@ import { env } from '../config/env';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export default async function createServer(fastify: FastifyInstance) {
+export async function createServer(fastify: FastifyInstance) {
   await fastify.register(Helmet, {
     contentSecurityPolicy: !env.isDevelopment,
     crossOriginEmbedderPolicy: !env.isDevelopment,
@@ -38,9 +38,7 @@ export default async function createServer(fastify: FastifyInstance) {
     dir: path.join(__dirname, '../modules'),
     dirNameRoutePrefix: false,
     matchFilter: (path) =>
-      ['.route.ts', '.resolver.ts', 'controller.ts'].some((e) =>
-        path.endsWith(e),
-      ),
+      ['.route.ts', '.resolver.ts', 'route.ts'].some((e) => path.endsWith(e)),
     options: {
       autoPrefix: 'api',
     },

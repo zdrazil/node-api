@@ -1,5 +1,5 @@
 import { PostgresDb } from '@fastify/postgres';
-import { Movie } from '../models';
+import { Movie } from './models';
 
 export type Repository = ReturnType<typeof createRepository>;
 
