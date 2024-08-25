@@ -1,5 +1,6 @@
 import { PostgresDb } from '@fastify/postgres';
 import { Movie } from './models';
+import { sql } from '../../tooling/sql';
 
 export type MovieRepository = ReturnType<typeof createMovieRepository>;
 
@@ -7,14 +8,24 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
   async function create(movie: Movie): Promise<boolean> {
     const transactionResult = await db.transact(async (client) => {
       const movieResult = await client.query(
-        'INSERT INTO movies (id, slug, title, yearofrelease) VALUES ($1, $2, $3, $4)',
+        sql`
+          INSERT INTO
+            movies (id, slug, title, yearofrelease)
+          VALUES
+            ($1, $2, $3, $4)
+        `,
         [movie.id, movie.slug, movie.title, movie.yearOfRelease],
       );
 
       if (movieResult.rowCount != null && movieResult.rowCount > 0) {
         movie.genres.forEach(async (genre) => {
           await client.query(
-            'INSERT INTO genres (movieId, name) VALUES ($1, $2)',
+            sql`
+              INSERT INTO
+                genres (movieId, name)
+              VALUES
+                ($1, $2)
+            `,
             [movie.id, genre],
           );
         });
@@ -41,15 +52,21 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
         'id' | 'title' | 'yearOfRelease' | 'slug' | 'rating' | 'userRating'
       >
     >(
-      `
-      select m.*, round(avg(r.rating), 1) as rating, myr.rating as userrating
-          from movies m
-          left join ratings r on m.id = r.movieid
-          left join ratings myr on m.id = myr.movieid
-              and myr.userid = $2
-          where id = $1
-          group by id, userrating
-              ;
+      sql`
+        SELECT
+          m.*,
+          ROUND(AVG(r.rating), 1) AS rating,
+          myr.rating AS userrating
+        FROM
+          movies m
+          LEFT JOIN ratings r ON m.id = r.movieid
+          LEFT JOIN ratings myr ON m.id = myr.movieid
+          AND myr.userid = $2
+        WHERE
+          id = $1
+        GROUP BY
+          id,
+          userrating;
       `,
       [id, userId],
     );
@@ -63,7 +80,14 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
     }
 
     const genresResult = await client.query<{ name: string }>(
-      'SELECT name FROM genres WHERE movieId = $1',
+      sql`
+        SELECT
+          name
+        FROM
+          genres
+        WHERE
+          movieId = $1
+      `,
       [id],
     );
 
@@ -90,15 +114,21 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
         'id' | 'title' | 'yearOfRelease' | 'slug' | 'rating' | 'userRating'
       >
     >(
-      `
-      select m.*, round(avg(r.rating), 1) as rating, myr.rating as userrating
-          from movies m
-          left join ratings r on m.id = r.movieid
-          left join ratings myr on m.id = myr.movieid
-              and myr.userid = $2
-          where slug = $1
-          group by id, userrating
-              ;
+      sql`
+        SELECT
+          m.*,
+          ROUND(AVG(r.rating), 1) AS rating,
+          myr.rating AS userrating
+        FROM
+          movies m
+          LEFT JOIN ratings r ON m.id = r.movieid
+          LEFT JOIN ratings myr ON m.id = myr.movieid
+          AND myr.userid = $2
+        WHERE
+          slug = $1
+        GROUP BY
+          id,
+          userrating;
       `,
       [slug, userId],
     );
@@ -112,7 +142,14 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
     }
 
     const genresResult = await client.query<{ name: string }>(
-      'SELECT name FROM genres WHERE movieId = $1',
+      sql`
+        SELECT
+          name
+        FROM
+          genres
+        WHERE
+          movieId = $1
+      `,
       [movie.id],
     );
 
@@ -139,15 +176,21 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
         'id' | 'title' | 'yearOfRelease' | 'slug' | 'rating' | 'userRating'
       >
     >(
-      `
-      select m.*, round(avg(r.rating), 1) as rating, myr.rating as userrating
-          from movies m
-          left join ratings r on m.id = r.movieid
-          left join ratings myr on m.id = myr.movieid
-              and myr.userid = $2
-          where slug = $1
-          group by id, userrating
-              ;
+      sql`
+        SELECT
+          m.*,
+          ROUND(AVG(r.rating), 1) AS rating,
+          myr.rating AS userrating
+        FROM
+          movies m
+          LEFT JOIN ratings r ON m.id = r.movieid
+          LEFT JOIN ratings myr ON m.id = myr.movieid
+          AND myr.userid = $2
+        WHERE
+          slug = $1
+        GROUP BY
+          id,
+          userrating;
       `,
       [slug, userId],
     );
@@ -161,7 +204,14 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
     }
 
     const genresResult = await client.query<{ name: string }>(
-      'SELECT name FROM genres WHERE movieId = $1',
+      sql`
+        SELECT
+          name
+        FROM
+          genres
+        WHERE
+          movieId = $1
+      `,
       [movie.id],
     );
 
