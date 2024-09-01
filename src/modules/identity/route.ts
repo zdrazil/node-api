@@ -1,7 +1,5 @@
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { FastifyRouteInstance } from '../../types';
-import { createIdDtoSchema } from '../api/id';
-import { ConflictException } from '../exceptions/exceptions';
 import { apiBase } from '../api/endpoints';
 import { createJwtTokenRequestDtoSchema, JwtPayload } from './schema';
 import { randomUUID } from 'crypto';
@@ -9,7 +7,9 @@ import { randomUUID } from 'crypto';
 const path = '/token';
 const lifetime = '8h';
 
-export async function createIdentityRoutes(fastify: FastifyRouteInstance) {
+export default async function createIdentityRoutes(
+  fastify: FastifyRouteInstance,
+) {
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
       const { customClaims, email, userId } = req.body;

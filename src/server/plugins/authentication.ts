@@ -1,7 +1,9 @@
 import fastifyJwt from '@fastify/jwt';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
-import { tokenSecret } from '../../modules/identity/constants';
+
+// TODO: Store and load this securely
+const tokenSecret = 'ForTheLoveOfGodStoreAndLoadThisSecurely';
 
 export type Authenticate = (
   request: FastifyRequest,

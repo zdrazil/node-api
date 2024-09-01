@@ -13,7 +13,12 @@ import {
   updateMovieRequestDtoSchema,
   updateMovieRequestToMovie,
 } from './updateMovie/schema';
-import { movieResponseDtoSchema, movieToGetMovieResponse } from './response';
+import { movieResponseDtoSchema, movieToMovieResponse } from './response';
+import {
+  getAllMoviesRequestDtoSchema,
+  GetAllMoviesResponseDto,
+  getAllMoviesResponseDtoSchema,
+} from './getAllMovies/schema';
 
 interface Dependencies {
   movieService: MovieService;
@@ -39,7 +44,7 @@ export async function createMovieController(
         throw error;
       }
 
-      const response = movieToGetMovieResponse(movie);
+      const response = movieToMovieResponse(movie);
 
       return res.status(201).send(response);
     },
@@ -69,7 +74,7 @@ export async function createMovieController(
         return res.status(404).send();
       }
 
-      const response = movieToGetMovieResponse(movie);
+      const response = movieToMovieResponse(movie);
 
       return res.send(response);
     },
@@ -87,27 +92,39 @@ export async function createMovieController(
 
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
-      const { id } = req.params;
+      const { order, page, perPage, sortBy, title, year } = req.params;
       const userId = req.user.userId;
 
-      const movie = isUuid(id)
-        ? await movieService.getById({ id, userId })
-        : await movieService.getBySlug({ slug: id, userId });
+      const movies = await movieService.getAll({
+        page,
+        pageSize: perPage,
+        sortField: sortBy,
+        sortOrder: order,
+        title: title,
+        userId,
+        year: year,
+      });
 
-      if (!movie) {
-        return res.status(404).send();
-      }
+      const movieCount = await movieService.getCount({
+        title,
+        yearOfRelease: year,
+      });
 
-      const response = movieToGetMovieResponse(movie);
+      const response: GetAllMoviesResponseDto = {
+        items: movies.map(movieToMovieResponse),
+        page,
+        perPage,
+        total: movieCount,
+      };
 
       return res.send(response);
     },
     method: 'GET',
     schema: {
       description: 'Get all movies',
-      params: createIdDtoSchema('Movie'),
+      params: getAllMoviesRequestDtoSchema,
       response: {
-        200: movieResponseDtoSchema,
+        200: getAllMoviesResponseDtoSchema,
       },
       tags: ['movies'],
     },
@@ -126,7 +143,7 @@ export async function createMovieController(
         return res.status(404).send();
       }
 
-      const response = movieToGetMovieResponse(movie);
+      const response = movieToMovieResponse(updatedMovie);
 
       return res.send(response);
     },

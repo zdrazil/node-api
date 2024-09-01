@@ -1,6 +1,5 @@
 import { FastifyRouteInstance } from '../../types';
 import { createRatingRepository } from '../ratings/repository';
-import { createRatingService } from '../ratings/service';
 import { createMovieController } from './controller';
 import { createMovieRepository } from './repository';
 import { createMovieService } from './service';
