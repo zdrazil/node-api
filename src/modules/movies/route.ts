@@ -1,11 +1,18 @@
 import { FastifyRouteInstance } from '../../types';
+import { createRatingRepository } from '../ratings/repository';
+import { createRatingService } from '../ratings/service';
 import { createMovieController } from './controller';
 import { createMovieRepository } from './repository';
 import { createMovieService } from './service';
 
 export default async function createRoute(fastify: FastifyRouteInstance) {
-  const repository = createMovieRepository({ db: fastify.pg });
-  const service = createMovieService({ movieRepository: repository });
+  const movieRepository = createMovieRepository({ db: fastify.pg });
+  const ratingRepository = createRatingRepository({ db: fastify.pg });
 
-  await createMovieController(fastify, { movieService: service });
+  const movieService = createMovieService({
+    movieRepository,
+    ratingRepository,
+  });
+
+  await createMovieController(fastify, { movieService });
 }

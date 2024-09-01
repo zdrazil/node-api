@@ -1,3 +1,4 @@
+import { RatingRepository } from '../ratings/repository';
 import { Movie } from './models';
 import { MovieRepository } from './repository';
 
@@ -5,8 +6,10 @@ export type MovieService = ReturnType<typeof createMovieService>;
 
 export const createMovieService = ({
   movieRepository,
+  ratingRepository,
 }: {
   movieRepository: MovieRepository;
+  ratingRepository: RatingRepository;
 }) => {
   async function create(movie: Movie): Promise<boolean> {
     // await movieValidator.ValidateAndThrowAsync(movie, cancellationToken);
@@ -17,7 +20,40 @@ export const createMovieService = ({
 
   const getBySlug = movieRepository.getBySlug;
 
-  const update = movieRepository.update;
+  async function update(
+    movie: Movie,
+    { userId }: { userId?: string },
+  ): Promise<Movie | null> {
+    const movieExists = await movieRepository.existsById({ id: movie.id });
+
+    if (!movieExists) {
+      return null;
+    }
+
+    await movieRepository.update({ movie });
+
+    if (userId == null) {
+      const rating = await ratingRepository.getRatingByMovieId({
+        movieId: movie.id,
+      });
+
+      return {
+        ...movie,
+        rating: rating,
+      };
+    }
+
+    const userRating = await ratingRepository.getRatingByMovieAndUserId({
+      movieId: movie.id,
+      userId,
+    });
+
+    return {
+      ...movie,
+      rating: movie.rating,
+      userRating: userRating,
+    };
+  }
 
   const deleteById = movieRepository.deleteById;
 
@@ -25,10 +61,10 @@ export const createMovieService = ({
 
   return {
     create,
+    deleteById,
     getById,
     getBySlug,
-    update,
-    deleteById,
     getCount,
+    update,
   };
 };

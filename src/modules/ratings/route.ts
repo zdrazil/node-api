@@ -7,9 +7,13 @@ import { createRatingService } from './service';
 
 export default async function createRoute(fastify: FastifyRouteInstance) {
   const movieRepository = createMovieRepository({ db: fastify.pg });
-  const movieService = createMovieService({ movieRepository: movieRepository });
-
   const ratingRepository = createRatingRepository({ db: fastify.pg });
+
+  const movieService = createMovieService({
+    movieRepository,
+    ratingRepository,
+  });
+
   const ratingService = createRatingService({
     movieRepository,
     ratingRepository,

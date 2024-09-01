@@ -8,11 +8,12 @@ import {
 } from './createMovie/schema';
 import { movieEndpoints } from './endpoints';
 import { MovieAlreadyExistsError } from './errors';
-import {
-  getMovieResponseDtoSchema,
-  movieToGetMovieResponse,
-} from './getMovie/schema';
 import { MovieService } from './service';
+import {
+  updateMovieRequestDtoSchema,
+  updateMovieRequestToMovie,
+} from './updateMovie/schema';
+import { movieResponseDtoSchema, movieToGetMovieResponse } from './response';
 
 interface Dependencies {
   movieService: MovieService;
@@ -37,7 +38,10 @@ export async function createMovieController(
         }
         throw error;
       }
-      return res.status(201).send({ id: movie.id });
+
+      const response = movieToGetMovieResponse(movie);
+
+      return res.status(201).send(response);
     },
     method: 'POST',
     onRequest: fastify.auth([fastify.verifyTrustedMember]),
@@ -45,7 +49,7 @@ export async function createMovieController(
       body: createMovieRequestDtoSchema,
       description: 'Create a movie',
       response: {
-        200: createIdDtoSchema('Movie'),
+        200: movieResponseDtoSchema,
       },
       tags: ['movies'],
     },
@@ -56,7 +60,6 @@ export async function createMovieController(
     handler: async (req, res) => {
       const { id } = req.params;
       const userId = req.user.userId;
-      // if id is guid use getById, if not try getBySlug
 
       const movie = isUuid(id)
         ? await movieService.getById({ id, userId })
@@ -75,10 +78,39 @@ export async function createMovieController(
       description: 'Get a movie by ID',
       params: createIdDtoSchema('Movie'),
       response: {
-        200: getMovieResponseDtoSchema,
+        200: movieResponseDtoSchema,
       },
       tags: ['movies'],
     },
     url: movieEndpoints.get,
+  });
+
+  fastify.withTypeProvider<TypeBoxTypeProvider>().route({
+    handler: async (req, res) => {
+      const userId = req.user.userId;
+
+      const movie = updateMovieRequestToMovie(req.body, req.params.id);
+
+      const updatedMovie = await movieService.update(movie, { userId });
+
+      if (!updatedMovie) {
+        return res.status(404).send();
+      }
+
+      const response = movieToGetMovieResponse(movie);
+
+      return res.send(response);
+    },
+    method: 'PUT',
+    schema: {
+      body: updateMovieRequestDtoSchema,
+      description: 'Update a movie by ID',
+      params: createIdDtoSchema('Movie'),
+      response: {
+        200: movieResponseDtoSchema,
+      },
+      tags: ['movies'],
+    },
+    url: movieEndpoints.update,
   });
 }

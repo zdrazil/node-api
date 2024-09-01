@@ -1,9 +1,9 @@
 export interface Movie {
   genres: string[];
   id: string;
+  rating?: number;
   slug: string;
   title: string;
-  yearOfRelease: number;
-  rating?: number;
   userRating?: number;
+  yearOfRelease: number;
 }
