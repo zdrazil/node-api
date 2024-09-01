@@ -1,6 +1,6 @@
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { FastifyRouteInstance } from '../../types';
-import { createIdDtoSchema } from '../api/id';
+import { createIdDtoSchema, isUuid } from '../api/id';
 import { ConflictException } from '../exceptions/exceptions';
 import {
   createMovieRequestDtoSchema,
@@ -55,8 +55,12 @@ export async function createMovieController(
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
       const { id } = req.params;
-      const userId = '';
-      const movie = await movieService.getById({ id, userId });
+      const userId = req.user.userId;
+      // if id is guid use getById, if not try getBySlug
+
+      const movie = isUuid(id)
+        ? await movieService.getById({ id, userId })
+        : await movieService.getBySlug({ slug: id, userId });
 
       if (!movie) {
         return res.status(404).send();

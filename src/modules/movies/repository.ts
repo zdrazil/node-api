@@ -50,7 +50,7 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
     userId,
   }: {
     id: string;
-    userId?: string;
+    userId: string;
   }): Promise<Movie | undefined> {
     const client = await db.connect();
 
