@@ -113,4 +113,25 @@ export async function createMovieController(
     },
     url: movieEndpoints.update,
   });
+
+  fastify.withTypeProvider<TypeBoxTypeProvider>().route({
+    handler: async (req, res) => {
+      const deleted = await movieService.deleteById({ id: req.params.id });
+
+      if (!deleted) {
+        return res.status(404).send();
+      }
+
+      return res.send();
+    },
+    method: 'DELETE',
+    onRequest: fastify.auth([fastify.verifyAdmin]),
+    schema: {
+      body: updateMovieRequestDtoSchema,
+      description: 'Delete a movie by ID',
+      params: createIdDtoSchema('Movie'),
+      tags: ['movies'],
+    },
+    url: movieEndpoints.delete,
+  });
 }
