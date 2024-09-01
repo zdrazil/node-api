@@ -7,6 +7,7 @@ import Helmet from '@fastify/helmet';
 import fastifyPostgres from '@fastify/postgres';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import UnderPressure from '@fastify/under-pressure';
+import jwt from '@fastify/jwt';
 import { FastifyInstance } from 'fastify';
 import { env } from '../config/env';
 
@@ -28,6 +29,7 @@ export async function createServer(fastify: FastifyInstance) {
     connectionString: env.db.url,
   });
 
+  // Auto-load plugins
   await fastify.register(AutoLoad, {
     dir: path.join(__dirname, 'plugins'),
     dirNameRoutePrefix: false,
