@@ -899,6 +899,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/auth@npm:4.6.1":
+  version: 4.6.1
+  resolution: "@fastify/auth@npm:4.6.1"
+  dependencies:
+    fastify-plugin: "npm:^4.0.0"
+    reusify: "npm:^1.0.4"
+  checksum: 10c0/30c231d973ee7023a452f2fc72af9065257145cfca728e082db8fc918cd04ebb28824ca7985d9a8d46f9f22a50896ab0a7f0469f0a1eb400eb188a959617efa9
+  languageName: node
+  linkType: hard
+
 "@fastify/autoload@npm:5.10.0":
   version: 5.10.0
   resolution: "@fastify/autoload@npm:5.10.0"
@@ -5699,6 +5709,7 @@ __metadata:
   dependencies:
     "@eslint/compat": "npm:1.1.0"
     "@eslint/js": "npm:9.6.0"
+    "@fastify/auth": "npm:4.6.1"
     "@fastify/autoload": "npm:5.10.0"
     "@fastify/awilix": "npm:5.1.0"
     "@fastify/cors": "npm:9.0.1"

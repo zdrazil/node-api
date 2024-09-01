@@ -2,6 +2,11 @@ import fastifyJwt from '@fastify/jwt';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
 
+export type Authenticate = (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => Promise<void>;
+
 async function authenticationPlugin(fastify: FastifyInstance) {
   await fastify.register(fastifyJwt, {
     secret: 'supersecret',
@@ -20,5 +25,5 @@ async function authenticationPlugin(fastify: FastifyInstance) {
 }
 
 export default fp(authenticationPlugin, {
-  name: 'requestContext',
+  name: 'authentication',
 });
