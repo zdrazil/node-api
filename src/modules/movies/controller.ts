@@ -87,6 +87,35 @@ export async function createMovieController(
 
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
+      const { id } = req.params;
+      const userId = req.user.userId;
+
+      const movie = isUuid(id)
+        ? await movieService.getById({ id, userId })
+        : await movieService.getBySlug({ slug: id, userId });
+
+      if (!movie) {
+        return res.status(404).send();
+      }
+
+      const response = movieToGetMovieResponse(movie);
+
+      return res.send(response);
+    },
+    method: 'GET',
+    schema: {
+      description: 'Get all movies',
+      params: createIdDtoSchema('Movie'),
+      response: {
+        200: movieResponseDtoSchema,
+      },
+      tags: ['movies'],
+    },
+    url: movieEndpoints.getAll,
+  });
+
+  fastify.withTypeProvider<TypeBoxTypeProvider>().route({
+    handler: async (req, res) => {
       const userId = req.user.userId;
 
       const movie = updateMovieRequestToMovie(req.body, req.params.id);
@@ -102,6 +131,7 @@ export async function createMovieController(
       return res.send(response);
     },
     method: 'PUT',
+    onRequest: fastify.auth([fastify.verifyTrustedMember]),
     schema: {
       body: updateMovieRequestDtoSchema,
       description: 'Update a movie by ID',
