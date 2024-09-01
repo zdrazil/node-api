@@ -1,6 +1,6 @@
-interface Rating {
+interface MovieRating {
   id: string;
   movieId: string;
-  slug: string;
   rating: number;
+  slug: string;
 }

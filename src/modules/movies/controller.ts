@@ -1,5 +1,4 @@
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
-import { Type } from '@sinclair/typebox';
 import { FastifyRouteInstance } from '../../types';
 import { createIdDtoSchema } from '../api/id';
 import { ConflictException } from '../exceptions/exceptions';
@@ -55,7 +54,8 @@ export async function createMovieController(
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
       const { id } = req.params;
-      const movie = await movieService.getById(id);
+      const userId = '';
+      const movie = await movieService.getById({ id, userId });
 
       if (!movie) {
         return res.status(404).send();

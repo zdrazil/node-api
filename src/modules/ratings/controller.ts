@@ -1,79 +1,40 @@
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
-import { Type } from '@sinclair/typebox';
 import { FastifyRouteInstance } from '../../types';
 import { createIdDtoSchema } from '../api/id';
-import { ConflictException } from '../exceptions/exceptions';
-import {
-  createMovieRequestDtoSchema,
-  createMovieRequestToMovie,
-} from './createMovie/schema';
-import { movieEndpoints } from './endpoints';
-import { MovieAlreadyExistsError } from './errors';
-import {
-  getMovieResponseDtoSchema,
-  movieToGetMovieResponse,
-} from './getMovie/schema';
-import { MovieService } from './service';
+import { MovieService } from '../movies/service';
+import { RatingService } from './service';
+import { ratingEndpoints } from './endpoints';
+import { rateMovieRequestDtoSchema } from './rateMovie/schema';
 
 interface Dependencies {
   movieService: MovieService;
+  ratingService: RatingService;
 }
 
-export async function createMovieController(
+export async function createRatingController(
   fastify: FastifyRouteInstance,
-  { movieService }: Dependencies,
+  { movieService, ratingService }: Dependencies,
 ) {
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
-    // constraints: {
-    //   version: '1',
-    // },
     handler: async (req, res) => {
-      const movie = createMovieRequestToMovie(req.body);
+      const result = await ratingService.rateMovie({
+        movieId: req.params.id,
+        rating: req.body.rating,
+        userId: '',
+      });
 
-      try {
-        await movieService.create(movie);
-      } catch (error) {
-        if (error instanceof ConflictException) {
-          throw new MovieAlreadyExistsError(error);
-        }
-        throw error;
-      }
-      return res.status(201).send({ id: movie.id });
+      return result ? res.status(201).send() : res.status(404).send();
     },
-    method: 'POST',
+    method: 'PUT',
     schema: {
-      body: createMovieRequestDtoSchema,
-      description: 'Create a movie',
-      response: {
-        200: createIdDtoSchema('Movie'),
-      },
-      tags: ['movies'],
-    },
-    url: movieEndpoints.create,
-  });
-
-  fastify.withTypeProvider<TypeBoxTypeProvider>().route({
-    handler: async (req, res) => {
-      const { id } = req.params;
-      const movie = await movieService.getById(id);
-
-      if (!movie) {
-        return res.status(404).send();
-      }
-
-      const response = movieToGetMovieResponse(movie);
-
-      return res.send(response);
-    },
-    method: 'GET',
-    schema: {
-      description: 'Get a movie by ID',
+      body: rateMovieRequestDtoSchema,
+      description: 'Rate a movie',
       params: createIdDtoSchema('Movie'),
       response: {
-        200: getMovieResponseDtoSchema,
+        200: createIdDtoSchema('Rating'),
       },
-      tags: ['movies'],
+      tags: ['ratings'],
     },
-    url: movieEndpoints.get,
+    url: ratingEndpoints.create,
   });
 }

@@ -21,7 +21,7 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
       );
 
       if (movieResult.rowCount != null && movieResult.rowCount > 0) {
-        movie.genres.forEach(async (genre) => {
+        for (const genre of movie.genres) {
           await client.query(
             sql`
               INSERT INTO
@@ -31,7 +31,7 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
             `,
             [movie.id, genre],
           );
-        });
+        }
       }
 
       await client.query('COMMIT');
@@ -188,7 +188,7 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
       );
 
       // Insert new genres
-      movie.genres.forEach(async (genre) => {
+      for (const genre of movie.genres) {
         await client.query(
           sql`
             INSERT INTO
@@ -198,7 +198,7 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
           `,
           [movie.id, genre],
         );
-      });
+      }
 
       // Update the movie
       const result = await client.query(

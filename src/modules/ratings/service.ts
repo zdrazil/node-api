@@ -1,11 +1,11 @@
 import { MovieRepository } from '../movies/repository';
 import { RatingRepository } from './repository';
 
-export type ratingService = ReturnType<typeof createRatingService>;
+export type RatingService = ReturnType<typeof createRatingService>;
 
 export const createRatingService = ({
-  ratingRepository,
   movieRepository,
+  ratingRepository,
 }: {
   movieRepository: MovieRepository;
   ratingRepository: RatingRepository;
@@ -19,15 +19,6 @@ export const createRatingService = ({
     rating: number;
     userId: string;
   }): Promise<boolean> {
-    if (rating <= 0 || rating > 5) {
-      throw new ValidationException([
-        {
-          PropertyName: 'Rating',
-          ErrorMessage: 'Rating must be between 1 and 5.',
-        },
-      ]);
-    }
-
     const movieExists = await movieRepository.existsById({ id: movieId });
 
     if (!movieExists) {

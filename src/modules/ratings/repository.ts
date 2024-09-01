@@ -67,12 +67,12 @@ export function createRatingRepository({ db }: { db: PostgresDb }) {
 
   async function rateMovie({
     movieId,
-    userId,
     rating,
+    userId,
   }: {
     movieId: string;
-    userId: string;
     rating: number;
+    userId: string;
   }): Promise<boolean> {
     const client = await db.connect();
 
@@ -123,10 +123,10 @@ export function createRatingRepository({ db }: { db: PostgresDb }) {
     userId,
   }: {
     userId: string;
-  }): Promise<Rating[]> {
+  }): Promise<MovieRating[]> {
     const client = await db.connect();
 
-    const ratings = await client.query<Rating>(
+    const ratings = await client.query<MovieRating>(
       sql`
         SELECT
           r.rating,
@@ -147,10 +147,10 @@ export function createRatingRepository({ db }: { db: PostgresDb }) {
   }
 
   return {
-    getRatingByMovieId,
-    getRatingByMovieAndUserId,
-    rateMovie,
     deleteRating,
+    getRatingByMovieAndUserId,
+    getRatingByMovieId,
     getRatingsForUser,
+    rateMovie,
   };
 }
