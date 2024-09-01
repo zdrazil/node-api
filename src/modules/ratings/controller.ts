@@ -16,9 +16,6 @@ export async function createRatingController(
   { movieService, ratingService }: Dependencies,
 ) {
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
-    config: {
-      allowedRoles: ['user'],
-    },
     handler: async (req, res) => {
       const result = await ratingService.rateMovie({
         movieId: req.params.id,

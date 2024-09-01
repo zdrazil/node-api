@@ -1,6 +1,7 @@
 import fastifyJwt from '@fastify/jwt';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
+import { tokenSecret } from '../../modules/identity/constants';
 
 export type Authenticate = (
   request: FastifyRequest,
@@ -9,7 +10,7 @@ export type Authenticate = (
 
 async function authenticationPlugin(fastify: FastifyInstance) {
   await fastify.register(fastifyJwt, {
-    secret: 'supersecret',
+    secret: tokenSecret,
   });
 
   fastify.decorate(

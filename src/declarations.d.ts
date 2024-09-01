@@ -1,17 +1,21 @@
 import { requestContext } from '@fastify/request-context';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import fastify from 'fastify';
-import { Authenticate } from './plugins/authentication';
-import { Authorize } from './plugins/authorization';
+import { Authenticate } from './server/plugins/authentication';
+import { Authorize } from './server/plugins/authorization';
 import '@fastify/jwt';
+import { JwtPayload } from './modules/identity/schema';
+import { Role } from './modules/authorization/roles';
 
 declare module '@fastify/jwt' {
   interface FastifyJWT {
-    payload: { id: number }; // payload type is used for signing and verifying
+    payload: JwtPayload; // payload type is used for signing and verifying
     user: {
-      age: number;
+      admin?: boolean;
+      email: string;
       id: number;
-      name: string;
+      trustedMember?: boolean;
+      userId: string;
     }; // user type is return type of `request.user` object
   }
 }
@@ -23,17 +27,14 @@ declare module '@fastify/request-context' {
 }
 
 declare module 'fastify' {
-  type Authorize = (
-    request: FastifyRequest,
-    reply: FastifyReply,
-  ) => Promise<void>;
-
   interface FastifyInstance
-    extends Authenticate,
-      Authorize,
-      FastifyJwtNamespace<{ namespace: 'security' }> {}
-
-  interface FastifyContextConfig {
-    allowedRoles?: string[];
+    extends FastifyJwtNamespace<{ namespace: 'security' }> {
+    authenticate: Authenticate;
+    verifyAdmin: Authorize;
+    verifyTrustedMember: Authorize;
   }
+
+  // interface FastifyContextConfig {
+  //   allowedRoles?: Role[];
+  // }
 }

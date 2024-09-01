@@ -1,4 +1,4 @@
-import { apiBase } from '../ratings/endpoints';
+import { apiBase } from '../api/endpoints';
 
 const movieBase = `${apiBase}/movies`;
 export const movieEndpoints = {

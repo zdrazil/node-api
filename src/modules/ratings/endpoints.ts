@@ -1,4 +1,4 @@
-export const apiBase = '/api';
+import { apiBase } from '../api/endpoints';
 
 const ratingBase = `${apiBase}/ratings`;
 

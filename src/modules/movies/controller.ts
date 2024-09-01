@@ -40,6 +40,7 @@ export async function createMovieController(
       return res.status(201).send({ id: movie.id });
     },
     method: 'POST',
+    onRequest: fastify.auth([fastify.verifyTrustedMember]),
     schema: {
       body: createMovieRequestDtoSchema,
       description: 'Create a movie',
