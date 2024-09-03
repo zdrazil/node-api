@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  postgres-node-api-test:
+    image: postgres:13
+    restart: always
+    env_file:
+      - path: ./.env.test
+        required: true
+    ports:
+      - "5433:5432"

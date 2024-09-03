@@ -31,6 +31,9 @@ const internalEnv = envSchema<Static<typeof schema>>({
 });
 
 export const env = {
+  db: {
+    url: `postgres://${internalEnv.POSTGRES_USER}:${internalEnv.POSTGRES_PASSWORD}@${internalEnv.POSTGRES_URL}/${internalEnv.POSTGRES_DB}?sslmode=disable`,
+  },
   isDevelopment: internalEnv.NODE_ENV === NodeEnv.development,
   isProduction: internalEnv.NODE_ENV === NodeEnv.production,
   log: {
@@ -42,7 +45,4 @@ export const env = {
     port: internalEnv.PORT,
   },
   version: process.env.npm_package_version ?? '0.0.0',
-  db: {
-    url: `postgres://${internalEnv.POSTGRES_USER}:${internalEnv.POSTGRES_PASSWORD}@${internalEnv.POSTGRES_URL}/${internalEnv.POSTGRES_DB}?sslmode=disable`,
-  },
 };

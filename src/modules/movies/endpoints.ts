@@ -6,7 +6,7 @@ export const movieEndpoints = {
   delete: `${movieBase}/:id`,
   deleteRating: `${movieBase}/:id/ratings`,
   get: `${movieBase}/:idOrSlug`,
-  getAll: `${movieBase}/movies`,
+  getAll: movieBase,
   rate: `${movieBase}/:id/ratings`,
   update: `${movieBase}/:id`,
 };

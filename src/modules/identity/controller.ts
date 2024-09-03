@@ -4,7 +4,7 @@ import { apiBase } from '../api/endpoints';
 import { createJwtTokenRequestDtoSchema, JwtPayload } from './schema';
 import { randomUUID } from 'crypto';
 
-const path = '/token';
+export const tokenPath = apiBase + '/token';
 const lifetime = '8h';
 
 export async function createIdentityController(fastify: FastifyRouteInstance) {
@@ -36,6 +36,18 @@ export async function createIdentityController(fastify: FastifyRouteInstance) {
       description: 'Create a JWT token',
       tags: ['identity'],
     },
-    url: apiBase + path,
+    url: tokenPath,
+  });
+
+  fastify.withTypeProvider<TypeBoxTypeProvider>().route({
+    handler: async (req, res) => {
+      await res.send({ token: 'hello' });
+    },
+    method: 'GET',
+    schema: {
+      description: 'Create a JWT token',
+      tags: ['identity'],
+    },
+    url: tokenPath,
   });
 }

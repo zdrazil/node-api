@@ -13,9 +13,10 @@
       //  "--no-cache" If debugger points to wrong lines, try this
     ],
     "env": {
-      "NODE_OPTIONS": "--import tsx"
+      "NODE_OPTIONS": "--experimental-vm-modules --import tsx"
     }
   },
+  "jestrunner.jestCommand": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
   "search.exclude": {
     ".yarn/releases/**/*": true
   },
