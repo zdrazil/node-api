@@ -1,11 +1,10 @@
-import Helmet from '@fastify/helmet';
 import Fastify, { FastifyInstance } from 'fastify';
 import Cors from '@fastify/cors';
 import { fileURLToPath } from 'node:url';
 import AutoLoad from '@fastify/autoload';
 import path, { dirname } from 'node:path';
 import fastifyPostgres from '@fastify/postgres';
-import { exec, execSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import { createMovieRepository } from '../movies/repository';
 import { createRatingRepository } from '../ratings/repository';
 import { createMovieService } from '../movies/service';
@@ -13,6 +12,7 @@ import { createRatingService } from '../ratings/service';
 import { createRatingController } from '../ratings/controller';
 import { createMovieController } from '../movies/controller';
 import { createIdentityController } from '../identity/controller';
+import { cwd } from 'node:process';
 
 async function createRoutes(fastify: FastifyInstance) {
   const movieRepository = createMovieRepository({ db: fastify.pg });
@@ -37,19 +37,6 @@ const POSTGRES_DB = 'admin';
 const POSTGRES_PASSWORD = 'test';
 
 const dbUrl = `postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_URL}/${POSTGRES_DB}?sslmode=disable`;
-
-describe('app', () => {
-  beforeAll(() => {
-    prepareDB();
-  });
-
-  afterAll(() => {
-    console.log('DELETE');
-    deleteDb();
-  });
-
-  test('requests the "/" route', async () => {});
-});
 
 const __Myfilename = fileURLToPath(import.meta.url);
 const __Mydirname = dirname(__Myfilename);
@@ -88,7 +75,7 @@ export async function startServer() {
   });
 
   await fastify.register(AutoLoad, {
-    dir: path.join(__Mydirname, 'server', 'plugins'),
+    dir: path.join(process.cwd(), 'src', 'server', 'plugins'),
     dirNameRoutePrefix: false,
   });
 
