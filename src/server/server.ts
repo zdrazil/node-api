@@ -9,9 +9,13 @@ import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import UnderPressure from '@fastify/under-pressure';
 import { FastifyInstance } from 'fastify';
 import { env } from '../config/env';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { createMovieRepository } from '../modules/movies/repository';
+import { createRatingRepository } from '../modules/ratings/repository';
+import { createMovieService } from '../modules/movies/service';
+import { createRatingService } from '../modules/ratings/service';
+import { createRatingController } from '../modules/ratings/controller';
+import { createMovieController } from '../modules/movies/controller';
+import { createIdentityController } from '../modules/identity/controller';
 
 export async function createServer(fastify: FastifyInstance) {
   await fastify.register(Helmet, {
@@ -34,18 +38,29 @@ export async function createServer(fastify: FastifyInstance) {
     dirNameRoutePrefix: false,
   });
 
-  // Auto-load routes
-  await fastify.register(AutoLoad, {
-    dir: path.join(__dirname, '../modules'),
-    dirNameRoutePrefix: false,
-    matchFilter: (path) =>
-      ['.route.ts', '.resolver.ts', 'route.ts'].some((e) => path.endsWith(e)),
-    options: {
-      autoPrefix: 'api',
-    },
-  });
+  await createRoutes(fastify);
 
   await fastify.register(UnderPressure);
 
   return fastify.withTypeProvider<TypeBoxTypeProvider>();
 }
+
+async function createRoutes(fastify: FastifyInstance) {
+  const movieRepository = createMovieRepository({ db: fastify.pg });
+  const ratingRepository = createRatingRepository({ db: fastify.pg });
+  const movieService = createMovieService({
+    movieRepository,
+    ratingRepository,
+  });
+  const ratingService = createRatingService({
+    movieRepository,
+    ratingRepository,
+  });
+
+  await createRatingController(fastify, { movieService, ratingService });
+  await createMovieController(fastify, { movieService });
+  await createIdentityController(fastify);
+}
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);

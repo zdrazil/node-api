@@ -7,9 +7,7 @@ import { randomUUID } from 'crypto';
 const path = '/token';
 const lifetime = '8h';
 
-export default async function createIdentityRoutes(
-  fastify: FastifyRouteInstance,
-) {
+export async function createIdentityController(fastify: FastifyRouteInstance) {
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
       const { customClaims, email, userId } = req.body;
@@ -35,7 +33,7 @@ export default async function createIdentityRoutes(
     method: 'POST',
     schema: {
       body: createJwtTokenRequestDtoSchema,
-      description: '',
+      description: 'Create a JWT token',
       tags: ['identity'],
     },
     url: apiBase + path,
