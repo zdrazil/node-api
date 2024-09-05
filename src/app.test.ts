@@ -9,7 +9,7 @@ describe('app', () => {
   beforeAll(async () => {
     const server = await startServer();
     fastify = server.fastify;
-    db = server.db;
+    db = server.dbEnvironment;
   });
 
   afterAll(async () => {

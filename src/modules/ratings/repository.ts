@@ -1,17 +1,17 @@
-import { PostgresDb } from '@fastify/postgres';
 import { sql } from '../../tooling/sql';
+import { Client } from 'pg';
 
 export type RatingRepository = ReturnType<typeof createRatingRepository>;
 
-export function createRatingRepository({ db }: { db: PostgresDb }) {
+export function createRatingRepository({ db }: { db: Client }) {
   async function getRatingByMovieId({
     movieId,
   }: {
     movieId: string;
   }): Promise<number> {
-    const client = await db.connect();
+    await db.connect();
 
-    const rating = await client.query<{ rating: number }>(
+    const rating = await db.query<{ rating: number }>(
       sql`
         SELECT
           round(avg(r.rating), 1) AS rating
@@ -23,7 +23,7 @@ export function createRatingRepository({ db }: { db: PostgresDb }) {
       [movieId],
     );
 
-    client.release();
+    await db.end();
 
     return rating.rows[0]?.rating ?? 0;
   }
@@ -35,9 +35,9 @@ export function createRatingRepository({ db }: { db: PostgresDb }) {
     movieId: string;
     userId: string;
   }): Promise<number> {
-    const client = await db.connect();
+    await db.connect();
 
-    const rating = await client.query<{ rating: number }>(
+    const rating = await db.query<{ rating: number }>(
       sql`
         SELECT
           round(avg(r.rating), 1),
@@ -60,7 +60,7 @@ export function createRatingRepository({ db }: { db: PostgresDb }) {
       [movieId, userId],
     );
 
-    client.release();
+    await db.end();
 
     return rating.rows[0]?.rating ?? 0;
   }
@@ -74,9 +74,9 @@ export function createRatingRepository({ db }: { db: PostgresDb }) {
     rating: number;
     userId: string;
   }): Promise<boolean> {
-    const client = await db.connect();
+    await db.connect();
 
-    const result = await client.query(
+    const result = await db.query(
       sql`
         INSERT INTO
           ratings (movieid, userid, rating)
@@ -90,7 +90,7 @@ export function createRatingRepository({ db }: { db: PostgresDb }) {
       [movieId, userId, rating],
     );
 
-    client.release();
+    await db.end();
 
     return (result.rowCount ?? 0) > 0;
   }
@@ -102,9 +102,9 @@ export function createRatingRepository({ db }: { db: PostgresDb }) {
     movieId: string;
     userId: string;
   }): Promise<boolean> {
-    const client = await db.connect();
+    await db.connect();
 
-    const result = await client.query(
+    const result = await db.query(
       sql`
         DELETE FROM ratings
         WHERE
@@ -114,7 +114,7 @@ export function createRatingRepository({ db }: { db: PostgresDb }) {
       [movieId, userId],
     );
 
-    client.release();
+    await db.end();
 
     return (result.rowCount ?? 0) > 0;
   }
@@ -124,9 +124,9 @@ export function createRatingRepository({ db }: { db: PostgresDb }) {
   }: {
     userId: string;
   }): Promise<MovieRating[]> {
-    const client = await db.connect();
+    await db.connect();
 
-    const ratings = await client.query<MovieRating>(
+    const ratings = await db.query<MovieRating>(
       sql`
         SELECT
           r.rating,
@@ -141,7 +141,7 @@ export function createRatingRepository({ db }: { db: PostgresDb }) {
       [userId],
     );
 
-    client.release();
+    await db.end();
 
     return ratings.rows;
   }

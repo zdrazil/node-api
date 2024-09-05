@@ -1,14 +1,15 @@
-import { PostgresDb } from '@fastify/postgres';
 import { Movie } from './models';
 import { sql } from '../../tooling/sql';
 import { SortOrder } from '../sortOrder';
 import { SortField } from './getAllMovies/schema';
+import { Client } from 'pg';
 
 export type MovieRepository = ReturnType<typeof createMovieRepository>;
 
-export function createMovieRepository({ db }: { db: PostgresDb }) {
+export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
   async function create(movie: Movie): Promise<boolean> {
-    const client = await db.connect();
+    const client = await db();
+    await client.connect();
 
     try {
       await client.query('BEGIN');
@@ -37,12 +38,12 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
       }
 
       await client.query('COMMIT');
-      client.release();
+      await client.end();
 
       return movieResult.rowCount != null && movieResult.rowCount > 0;
     } catch (e) {
       await client.query('ROLLBACK');
-      client.release();
+      await client.end();
       throw e;
     }
   }
@@ -54,7 +55,8 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
     id: string;
     userId: string;
   }): Promise<Movie | undefined> {
-    const client = await db.connect();
+    const client = await db();
+    await client.connect();
 
     const movieResult = await client.query<
       Pick<
@@ -84,7 +86,7 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
     const movie = movieResult.rows[0];
 
     if (!movie) {
-      client.release();
+      await client.end();
 
       return undefined;
     }
@@ -101,6 +103,8 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
       [id],
     );
 
+    await client.end();
+
     const result = {
       ...movie,
       genres: genresResult.rows.map((row) => row.name),
@@ -116,7 +120,8 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
     slug: string;
     userId?: string;
   }): Promise<Movie | undefined> {
-    const client = await db.connect();
+    const client = await db();
+    await client.connect();
 
     const movieResult = await client.query<
       Pick<
@@ -146,7 +151,7 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
     const movie = movieResult.rows[0];
 
     if (!movie) {
-      client.release();
+      await client.end();
 
       return undefined;
     }
@@ -163,7 +168,7 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
       [movie.id],
     );
 
-    client.release();
+    await client.end();
 
     const result = {
       ...movie,
@@ -174,7 +179,8 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
   }
 
   async function update({ movie }: { movie: Movie }): Promise<boolean> {
-    const client = await db.connect();
+    const client = await db();
+    await client.connect();
 
     try {
       await client.query('BEGIN');
@@ -218,18 +224,19 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
 
       await client.query('COMMIT');
 
-      client.release();
+      await client.end();
 
       return result.rowCount != null && result.rowCount > 0;
     } catch (e) {
       await client.query('ROLLBACK');
-      client.release();
+      await client.end();
       throw e;
     }
   }
 
   async function deleteById({ id }: { id: string }): Promise<boolean> {
-    const client = await db.connect();
+    const client = await db();
+    await client.connect();
 
     try {
       await client.query('BEGIN');
@@ -266,18 +273,19 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
 
       await client.query('COMMIT');
 
-      client.release();
+      await client.end();
 
       return result.rowCount != null && result.rowCount > 0;
     } catch (e) {
       await client.query('ROLLBACK');
-      client.release();
+      await client.end();
       throw e;
     }
   }
 
   async function existsById({ id }: { id: string }): Promise<boolean> {
-    const client = await db.connect();
+    const client = await db();
+    await client.connect();
 
     // Exists
     const result = await client.query(
@@ -292,7 +300,7 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
       [id],
     );
 
-    client.release();
+    await client.end();
 
     return result.rowCount != null && result.rowCount > 0;
   }
@@ -314,7 +322,8 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
     userId?: string;
     year?: number;
   }) {
-    const client = await db.connect();
+    const client = await db();
+    await client.connect();
 
     const orderClause =
       sortField != null
@@ -379,7 +388,8 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
     title?: string;
     yearOfRelease?: number;
   }): Promise<number> {
-    const client = await db.connect();
+    const client = await db();
+    await client.connect();
 
     const result = await client.query<{ count: number }>(
       sql`
@@ -400,7 +410,7 @@ export function createMovieRepository({ db }: { db: PostgresDb }) {
       [title, yearOfRelease],
     );
 
-    client.release();
+    await client.end();
 
     return result.rows[0]?.count ?? 0;
   }

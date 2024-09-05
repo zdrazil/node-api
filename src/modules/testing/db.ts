@@ -15,10 +15,17 @@ import {
   DockerComposeEnvironment,
   StartedDockerComposeEnvironment,
 } from 'testcontainers';
+import pg from 'pg';
 
-async function createRoutes(fastify: FastifyInstance) {
-  const movieRepository = createMovieRepository({ db: fastify.pg });
-  const ratingRepository = createRatingRepository({ db: fastify.pg });
+async function createRoutes({
+  db,
+  fastify,
+}: {
+  db: pg.Client;
+  fastify: FastifyInstance;
+}) {
+  const movieRepository = createMovieRepository({ db });
+  const ratingRepository = createRatingRepository({ db });
   const movieService = createMovieService({
     movieRepository,
     ratingRepository,
@@ -47,14 +54,13 @@ const dbEnvironment = new DockerComposeEnvironment(
   composeFile,
 );
 
-const dockerComposeBase = `docker-compose -f ${path.join(process.cwd(), 'docker-compose.test.yml')}`;
-
-async function prepareDB() {
+export async function startDbEnvironment() {
   const db = await dbEnvironment.up();
 
   execSync('yarn run db:migrate', {
     env: { ...process.env, DBMATE_DATABASE_URL: dbUrl },
   });
+
   execSync('yarn run db:seed', {
     env: { ...process.env, DBMATE_DATABASE_URL: dbUrl },
   });
@@ -62,8 +68,10 @@ async function prepareDB() {
   return db;
 }
 
+export const createDb = async () => new pg.Client({ connectionString: dbUrl });
+
 export async function startServer() {
-  const db = await prepareDB();
+  const dbEnvironment = await startDbEnvironment();
 
   const fastify = Fastify({
     ajv: {
@@ -77,18 +85,16 @@ export async function startServer() {
     origin: false,
   });
 
-  await fastify.register(fastifyPostgres, {
-    connectionString: dbUrl,
-  });
+  const db = new Client({ connectionString: dbUrl });
 
   await fastify.register(AutoLoad, {
     dir: path.join(process.cwd(), 'src', 'server', 'plugins'),
     dirNameRoutePrefix: false,
   });
 
-  await createRoutes(fastify);
+  await createRoutes({ db, fastify });
 
-  return { db, fastify };
+  return { dbEnvironment, fastify };
 }
 
 export async function closeServer(

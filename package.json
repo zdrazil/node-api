@@ -52,7 +52,8 @@
     "fastify": "4.28.1",
     "fluent-json-schema": "5.0.0",
     "fp-ts": "^2.16.9",
-    "pg": "8.12.0",
+    "node-postgres": "^0.6.2",
+    "pg": "^8.12.0",
     "postgres": "3.4.4"
   },
   "devDependencies": {

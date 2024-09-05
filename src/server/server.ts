@@ -4,7 +4,6 @@ import { fileURLToPath } from 'url';
 import AutoLoad from '@fastify/autoload';
 import Cors from '@fastify/cors';
 import Helmet from '@fastify/helmet';
-import fastifyPostgres from '@fastify/postgres';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import UnderPressure from '@fastify/under-pressure';
 import { FastifyInstance } from 'fastify';
@@ -16,6 +15,7 @@ import { createRatingService } from '../modules/ratings/service';
 import { createRatingController } from '../modules/ratings/controller';
 import { createMovieController } from '../modules/movies/controller';
 import { createIdentityController } from '../modules/identity/controller';
+import pg, { Client } from 'pg';
 
 export async function createServer(fastify: FastifyInstance) {
   await fastify.register(Helmet, {
@@ -28,7 +28,7 @@ export async function createServer(fastify: FastifyInstance) {
     origin: false,
   });
 
-  await fastify.register(fastifyPostgres, {
+  const db = new Client({
     connectionString: env.db.url,
   });
 
@@ -38,16 +38,22 @@ export async function createServer(fastify: FastifyInstance) {
     dirNameRoutePrefix: false,
   });
 
-  await createRoutes(fastify);
+  await createRoutes({ db, fastify });
 
   await fastify.register(UnderPressure);
 
   return fastify.withTypeProvider<TypeBoxTypeProvider>();
 }
 
-async function createRoutes(fastify: FastifyInstance) {
-  const movieRepository = createMovieRepository({ db: fastify.pg });
-  const ratingRepository = createRatingRepository({ db: fastify.pg });
+async function createRoutes({
+  db,
+  fastify,
+}: {
+  db: Client;
+  fastify: FastifyInstance;
+}) {
+  const movieRepository = createMovieRepository({ db });
+  const ratingRepository = createRatingRepository({ db });
   const movieService = createMovieService({
     movieRepository,
     ratingRepository,

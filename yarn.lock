@@ -7140,7 +7140,8 @@ __metadata:
     fp-ts: "npm:^2.16.9"
     globals: "npm:15.8.0"
     jest: "npm:29.7.0"
-    pg: "npm:8.12.0"
+    node-postgres: "npm:^0.6.2"
+    pg: "npm:^8.12.0"
     pino-pretty: "npm:^11.2.2"
     postgres: "npm:3.4.4"
     prettier: "npm:3.3.3"
@@ -7182,6 +7183,13 @@ __metadata:
   version: 0.4.0
   resolution: "node-int64@npm:0.4.0"
   checksum: 10c0/a6a4d8369e2f2720e9c645255ffde909c0fbd41c92ea92a5607fc17055955daac99c1ff589d421eee12a0d24e99f7bfc2aabfeb1a4c14742f6c099a51863f31a
+  languageName: node
+  linkType: hard
+
+"node-postgres@npm:^0.6.2":
+  version: 0.6.2
+  resolution: "node-postgres@npm:0.6.2"
+  checksum: 10c0/e45437f3e710fb9d38bdcef76d0b043ad2b7e038f6566215c387b780ff73836ee11c60e9acc2b4ceb571370ec219eb978bdf3c7d290b07209e776e31131c9270
   languageName: node
   linkType: hard
 
@@ -7649,7 +7657,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg@npm:8.12.0":
+"pg@npm:^8.12.0":
   version: 8.12.0
   resolution: "pg@npm:8.12.0"
   dependencies:
