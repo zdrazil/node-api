@@ -1,8 +1,7 @@
 import Fastify, { FastifyInstance } from 'fastify';
 import Cors from '@fastify/cors';
-import { fileURLToPath } from 'node:url';
 import AutoLoad from '@fastify/autoload';
-import path, { dirname } from 'node:path';
+import path from 'node:path';
 import fastifyPostgres from '@fastify/postgres';
 import { execSync } from 'node:child_process';
 import { createMovieRepository } from '../movies/repository';
@@ -12,7 +11,10 @@ import { createRatingService } from '../ratings/service';
 import { createRatingController } from '../ratings/controller';
 import { createMovieController } from '../movies/controller';
 import { createIdentityController } from '../identity/controller';
-import { cwd } from 'node:process';
+import {
+  DockerComposeEnvironment,
+  StartedDockerComposeEnvironment,
+} from 'testcontainers';
 
 async function createRoutes(fastify: FastifyInstance) {
   const movieRepository = createMovieRepository({ db: fastify.pg });
@@ -38,14 +40,17 @@ const POSTGRES_PASSWORD = 'test';
 
 const dbUrl = `postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_URL}/${POSTGRES_DB}?sslmode=disable`;
 
-const __Myfilename = fileURLToPath(import.meta.url);
-const __Mydirname = dirname(__Myfilename);
+const composeFilePath = process.cwd();
+const composeFile = 'docker-compose.test.yml';
+const dbEnvironment = new DockerComposeEnvironment(
+  composeFilePath,
+  composeFile,
+);
 
 const dockerComposeBase = `docker-compose -f ${path.join(process.cwd(), 'docker-compose.test.yml')}`;
 
-function prepareDB() {
-  // run docker compose in node
-  execSync(`${dockerComposeBase} up -d`);
+async function prepareDB() {
+  const db = await dbEnvironment.up();
 
   execSync('yarn run db:migrate', {
     env: { ...process.env, DBMATE_DATABASE_URL: dbUrl },
@@ -53,10 +58,12 @@ function prepareDB() {
   execSync('yarn run db:seed', {
     env: { ...process.env, DBMATE_DATABASE_URL: dbUrl },
   });
+
+  return db;
 }
 
 export async function startServer() {
-  prepareDB();
+  const db = await prepareDB();
 
   const fastify = Fastify({
     ajv: {
@@ -81,15 +88,13 @@ export async function startServer() {
 
   await createRoutes(fastify);
 
-  return fastify;
+  return { db, fastify };
 }
 
-function deleteDb() {
-  execSync(`${dockerComposeBase} stop`);
-  execSync(`${dockerComposeBase} rm -f -v`);
-}
-
-export async function closeServer(fastify: FastifyInstance) {
+export async function closeServer(
+  fastify: FastifyInstance,
+  db: StartedDockerComposeEnvironment,
+) {
   await fastify.close();
-  deleteDb();
+  await db.down();
 }

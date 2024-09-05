@@ -1,15 +1,19 @@
 import { FastifyInstance } from 'fastify';
 import { closeServer, startServer } from './modules/testing/db';
+import { StartedDockerComposeEnvironment } from 'testcontainers';
 
 describe('app', () => {
   let fastify: FastifyInstance;
+  let db: StartedDockerComposeEnvironment;
 
   beforeAll(async () => {
-    fastify = await startServer();
+    const server = await startServer();
+    fastify = server.fastify;
+    db = server.db;
   });
 
   afterAll(async () => {
-    await closeServer(fastify);
+    await closeServer(fastify, db);
   });
 
   test('requests the "/" route', async () => {
