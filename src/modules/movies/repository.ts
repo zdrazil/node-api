@@ -5,6 +5,9 @@ import { SortField } from './getAllMovies/schema';
 import { Client } from 'pg';
 import { objectToCamel } from 'ts-case-convert';
 
+const stringToNumber = (str?: string) =>
+  str != null ? Number(str) : undefined;
+
 export type MovieRepository = ReturnType<typeof createMovieRepository>;
 
 export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
@@ -109,8 +112,8 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     const result: Movie = {
       genres: genresResult.rows.map((row) => row.name),
       ...objectToCamel(movie),
-      rating: Number(movie.rating),
-      userRating: Number(movie.user_rating),
+      rating: stringToNumber(movie.rating),
+      userRating: stringToNumber(movie.user_rating),
       yearOfRelease: Number(movie.year_of_release),
     };
 
@@ -177,8 +180,8 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     const result: Movie = {
       ...objectToCamel(movie),
       genres: genresResult.rows.map((row) => row.name),
-      rating: Number(movie.rating),
-      userRating: Number(movie.user_rating),
+      rating: stringToNumber(movie.rating),
+      userRating: stringToNumber(movie.user_rating),
       yearOfRelease: Number(movie.year_of_release),
     };
 
@@ -377,10 +380,10 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
       (row): Movie => ({
         genres: row.genres.split(','),
         id: row.id,
-        rating: Number(row.rating),
+        rating: stringToNumber(row.rating),
         slug: row.slug,
         title: row.title,
-        userRating: Number(row.user_rating),
+        userRating: stringToNumber(row.user_rating),
         yearOfRelease: Number(row.year_of_release),
       }),
     );
