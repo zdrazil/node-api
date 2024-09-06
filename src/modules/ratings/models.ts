@@ -4,3 +4,10 @@ interface MovieRating {
   rating: number;
   slug: string;
 }
+
+interface MovieRatingDb {
+  id: string;
+  movie_id: string;
+  rating: number;
+  slug: string;
+}

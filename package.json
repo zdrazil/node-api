@@ -54,7 +54,8 @@
     "fp-ts": "^2.16.9",
     "node-postgres": "^0.6.2",
     "pg": "^8.12.0",
-    "postgres": "3.4.4"
+    "postgres": "3.4.4",
+    "ts-case-convert": "^2.0.7"
   },
   "devDependencies": {
     "@eslint/compat": "1.1.0",

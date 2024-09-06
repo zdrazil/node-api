@@ -7151,6 +7151,7 @@ __metadata:
     prettier-plugin-sql: "npm:0.18.1"
     tap: "npm:^21.0.1"
     testcontainers: "npm:^10.13.0"
+    ts-case-convert: "npm:^2.0.7"
     ts-jest: "npm:29.2.5"
     ts-node: "npm:10.9.2"
     tsx: "npm:4.16.2"
@@ -9274,6 +9275,13 @@ __metadata:
   peerDependencies:
     typescript: ">=4.2.0"
   checksum: 10c0/f54a0ba9ed56ce66baea90a3fa087a484002e807f28a8ccb2d070c75e76bde64bd0f6dce98b3802834156306050871b67eec325cb4e918015a360a3f0868c77c
+  languageName: node
+  linkType: hard
+
+"ts-case-convert@npm:^2.0.7":
+  version: 2.0.7
+  resolution: "ts-case-convert@npm:2.0.7"
+  checksum: 10c0/57225aa78e64a3424a7daf26a67039f07f7fd8f81ec9cc678cbc9051cf83e7d83ee00f32ac511e6e8f93a6c7c4e3b1275f52a0e8724a50fb3f7e988307122fbe
   languageName: node
   linkType: hard
 

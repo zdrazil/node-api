@@ -18,7 +18,7 @@ export function createRatingRepository({ db }: { db: Client }) {
         FROM
           ratings r
         WHERE
-          movieid = $1
+          movie_id = $1
       `,
       [movieId],
     );
@@ -47,15 +47,15 @@ export function createRatingRepository({ db }: { db: Client }) {
             FROM
               ratings
             WHERE
-              movieid = $1
-              AND userid = $2
+              movie_id = $1
+              AND user_id = $2
             LIMIT
               1
           )
         FROM
           ratings r
         WHERE
-          movieid = $1;
+          movie_id = $1;
       `,
       [movieId, userId],
     );
@@ -79,10 +79,10 @@ export function createRatingRepository({ db }: { db: Client }) {
     const result = await db.query(
       sql`
         INSERT INTO
-          ratings (movieid, userid, rating)
+          ratings (movie_id, user_id, rating)
         VALUES
           ($1, $2, $3)
-        ON CONFLICT (movieid, userid) DO
+        ON CONFLICT (movie_id, user_id) DO
         UPDATE
         SET
           rating = $3
@@ -108,8 +108,8 @@ export function createRatingRepository({ db }: { db: Client }) {
       sql`
         DELETE FROM ratings
         WHERE
-          movieid = $1
-          AND userid = $2
+          movie_id = $1
+          AND user_id = $2
       `,
       [movieId, userId],
     );
@@ -130,11 +130,11 @@ export function createRatingRepository({ db }: { db: Client }) {
       sql`
         SELECT
           r.rating,
-          r.movieid,
+          r.movie_id,
           m.slug
         FROM
           ratings r
-          INNER JOIN movies m ON r.movieid = m.id
+          INNER JOIN movies m ON r.movie_id = m.id
         WHERE
           userid = $1
       `,

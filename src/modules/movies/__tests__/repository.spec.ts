@@ -24,14 +24,14 @@ describe('movies repository - create', () => {
 
     const result = await repository.getById({ id, userId });
 
-    const expected = {
+    const expected: Movie = {
       genres: ['Action', 'Thriller'],
       id: '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3',
-      rating: '4.5',
+      rating: 4.5,
       slug: 'movie-1',
       title: 'Movie 1',
-      userrating: 4,
-      yearofrelease: 2020,
+      userRating: 4,
+      yearOfRelease: 2020,
     };
     expect(result).toEqual(expected);
   });
@@ -61,9 +61,9 @@ describe('movies repository - create', () => {
     });
 
     expect(result).toEqual({
-      movie,
-      userrating: null,
-      yearofrelease: 2021,
+      ...movie,
+      rating: null,
+      userRating: null,
     });
   });
 });

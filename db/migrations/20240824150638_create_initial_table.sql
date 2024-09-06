@@ -1,23 +1,10 @@
 -- migrate:up
-create table if not exists movies (
-  id UUID primary key,
-  slug TEXT not null,
-  title TEXT not null,
-  yearofrelease integer not null
-);
+CREATE TABLE IF NOT EXISTS movies (id UUID PRIMARY KEY, slug TEXT NOT NULL, title TEXT NOT NULL, year_of_release INTEGER NOT NULL);
 
-create unique index if not exists idx_movies_slug on movies using btree (slug);
+CREATE UNIQUE index if NOT EXISTS idx_movies_slug ON movies USING btree (slug);
 
-create table if not exists genres (
-  movieId UUID references movies (Id),
-  name TEXT not null
-);
+CREATE TABLE IF NOT EXISTS genres (movie_id UUID REFERENCES movies (Id), name TEXT NOT NULL);
 
-create table if not exists ratings (
-  userid uuid,
-  movieid uuid references movies (id),
-  rating integer not null,
-  primary key (userid, movieid)
-);
+CREATE TABLE IF NOT EXISTS ratings (user_id UUID, movie_id UUID REFERENCES movies (id), rating INTEGER NOT NULL, PRIMARY KEY (user_id, movie_id));
 
 -- migrate:down

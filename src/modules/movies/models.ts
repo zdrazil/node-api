@@ -7,3 +7,13 @@ export interface Movie {
   userRating?: number;
   yearOfRelease: number;
 }
+
+export interface MovieDb {
+  genres: string[];
+  id: string;
+  rating?: number;
+  slug: string;
+  title: string;
+  user_rating?: number;
+  year_of_release: number;
+}

@@ -1,8 +1,9 @@
-import { Movie } from './models';
+import { MovieDb, Movie } from './models';
 import { sql } from '../../tooling/sql';
 import { SortOrder } from '../sortOrder';
 import { SortField } from './getAllMovies/schema';
 import { Client } from 'pg';
+import { objectToCamel } from 'ts-case-convert';
 
 export type MovieRepository = ReturnType<typeof createMovieRepository>;
 
@@ -16,7 +17,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
       const movieResult = await client.query(
         sql`
           INSERT INTO
-            movies (id, slug, title, yearofrelease)
+            movies (id, slug, title, year_of_release)
           VALUES
             ($1, $2, $3, $4)
         `,
@@ -28,7 +29,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
           await client.query(
             sql`
               INSERT INTO
-                genres (movieId, name)
+                genres (movie_id, name)
               VALUES
                 ($1, $2)
             `,
@@ -60,25 +61,25 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
 
     const movieResult = await client.query<
       Pick<
-        Movie,
-        'id' | 'title' | 'yearOfRelease' | 'slug' | 'rating' | 'userRating'
+        MovieDb,
+        'id' | 'title' | 'year_of_release' | 'slug' | 'rating' | 'user_rating'
       >
     >(
       sql`
         SELECT
           m.*,
           round(avg(r.rating), 1) AS rating,
-          myr.rating AS userrating
+          myr.rating AS user_rating
         FROM
           movies m
-          LEFT JOIN ratings r ON m.id = r.movieid
-          LEFT JOIN ratings myr ON m.id = myr.movieid
-          AND myr.userid = $2
+          LEFT JOIN ratings r ON m.id = r.movie_id
+          LEFT JOIN ratings myr ON m.id = myr.movie_id
+          AND myr.user_id = $2
         WHERE
           id = $1
         GROUP BY
           id,
-          userrating;
+          user_rating;
       `,
       [id, userId],
     );
@@ -98,16 +99,18 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
         FROM
           genres
         WHERE
-          movieId = $1
+          movie_id = $1
       `,
       [id],
     );
 
     await client.end();
 
-    const result = {
-      ...movie,
+    const result: Movie = {
       genres: genresResult.rows.map((row) => row.name),
+      ...objectToCamel(movie),
+      rating: Number(movie.rating),
+      userRating: Number(movie.user_rating),
     };
 
     return result;
@@ -125,25 +128,25 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
 
     const movieResult = await client.query<
       Pick<
-        Movie,
-        'id' | 'title' | 'yearOfRelease' | 'slug' | 'rating' | 'userRating'
+        MovieDb,
+        'id' | 'title' | 'year_of_release' | 'slug' | 'rating' | 'user_rating'
       >
     >(
       sql`
         SELECT
           m.*,
           round(avg(r.rating), 1) AS rating,
-          myr.rating AS userrating
+          myr.rating AS user_rating
         FROM
           movies m
-          LEFT JOIN ratings r ON m.id = r.movieid
-          LEFT JOIN ratings myr ON m.id = myr.movieid
-          AND myr.userid = $2
+          LEFT JOIN ratings r ON m.id = r.movie_id
+          LEFT JOIN ratings myr ON m.id = myr.movie_id
+          AND myr.user_id = $2
         WHERE
           slug = $1
         GROUP BY
           id,
-          userrating;
+          user_rating;
       `,
       [slug, userId],
     );
@@ -163,7 +166,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
         FROM
           genres
         WHERE
-          movieId = $1
+          movie_id = $1
       `,
       [movie.id],
     );
@@ -171,7 +174,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     await client.end();
 
     const result = {
-      ...movie,
+      ...objectToCamel(movie),
       genres: genresResult.rows.map((row) => row.name),
     };
 
@@ -190,7 +193,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
         sql`
           DELETE FROM genres
           WHERE
-            movieId = $1;
+            movie_id = $1;
         `,
         [movie.id],
       );
@@ -200,7 +203,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
         await client.query(
           sql`
             INSERT INTO
-              genres (movieId, name)
+              genres (movie_id, name)
             VALUES
               ($1, $2)
           `,
@@ -215,7 +218,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
           SET
             slug = $1,
             title = $2,
-            yearofrelease = $3
+            year_of_release = $3
           WHERE
             id = $4
         `,
@@ -246,7 +249,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
         sql`
           DELETE FROM genres
           WHERE
-            movieId = $1;
+            movie_id = $1;
         `,
         [id],
       );
@@ -256,7 +259,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
         sql`
           DELETE FROM ratings
           WHERE
-            movieId = $1;
+            movie_id = $1;
         `,
         [id],
       );
@@ -343,25 +346,25 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
       rating: string;
       slug: string;
       title: string;
-      userrating: string;
-      yearofrelease: string;
+      user_rating: string;
+      year_of_release: string;
     }>(
       sql`
         SELECT m.*,
               string_agg(DISTINCT g.name, ',') AS genres,
               round(avg(r.rating), 1) AS rating,
-              myr.rating AS userrating
+              myr.rating AS user_rating
         FROM movies m
-        LEFT JOIN genres g ON m.id = g.movieid
-        LEFT JOIN ratings r ON m.id = r.movieid
-        LEFT JOIN ratings myr ON m.id = myr.movieid
-        AND myr.userid = $1
+        LEFT JOIN genres g ON m.id = g.movie_id
+        LEFT JOIN ratings r ON m.id = r.movie_id
+        LEFT JOIN ratings myr ON m.id = myr.movie_id
+        AND myr.user_id = $1
         WHERE ($title IS NULL
               OR m.title like ('%' || $2 || '%'))
           AND ($3 IS NULL
-              OR m.yearofrelease = $3)
+              OR m.year_of_release = $3)
         GROUP BY id,
-                userrating ${orderClause}
+                user_rating ${orderClause}
         LIMIT $4
         OFFSET $5
       `,
@@ -375,8 +378,8 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
         rating: Number(row.rating),
         slug: row.slug,
         title: row.title,
-        userRating: Number(row.userrating),
-        yearOfRelease: Number(row.yearofrelease),
+        userRating: Number(row.user_rating),
+        yearOfRelease: Number(row.year_of_release),
       }),
     );
   }
@@ -404,7 +407,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
           )
           AND (
             $2 IS NULL
-            OR yearofrelease = $2
+            OR year_of_release = $2
           )
       `,
       [title, yearOfRelease],
