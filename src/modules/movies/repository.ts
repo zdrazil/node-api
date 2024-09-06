@@ -399,7 +399,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     const client = await db();
     await client.connect();
 
-    const result = await client.query<{ count: number }>(
+    const result = await client.query<{ count: string }>(
       sql`
         SELECT
           count(id)
@@ -407,11 +407,11 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
           movies
         WHERE
           (
-            $1 IS NULL
+            $1::TEXT IS NULL
             OR title LIKE ('%' || $1 || '%')
           )
           AND (
-            $2 IS NULL
+            $2::INTEGER IS NULL
             OR year_of_release = $2
           )
       `,
@@ -420,7 +420,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
 
     await client.end();
 
-    return result.rows[0]?.count ?? 0;
+    return stringToNumber(result.rows[0]?.count) ?? 0;
   }
 
   return {

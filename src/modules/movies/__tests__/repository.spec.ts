@@ -180,4 +180,39 @@ describe('movies repository', () => {
   //     expect(result).toEqual([]);
   //   });
   // });
+
+  describe('getCount', () => {
+    it('gets count of movies', async () => {
+      const result = await repository.getCount({});
+
+      expect(result).toBe(3);
+    });
+
+    it('gets count of movies by title', async () => {
+      const result = await repository.getCount({ title: 'Movie 1' });
+
+      expect(result).toBe(1);
+    });
+
+    it('gets count of movies by year of release', async () => {
+      const result = await repository.getCount({ yearOfRelease: 2020 });
+
+      expect(result).toBe(1);
+    });
+
+    it('gets count of movies by title and year of release', async () => {
+      const result = await repository.getCount({
+        title: 'Movie 1',
+        yearOfRelease: 2020,
+      });
+
+      expect(result).toBe(1);
+    });
+
+    it('returns 0 if no movies exist', async () => {
+      const result = await repository.getCount({ title: 'Weird movie' });
+
+      expect(result).toBe(0);
+    });
+  });
 });
