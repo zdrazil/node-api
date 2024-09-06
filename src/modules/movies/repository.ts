@@ -111,6 +111,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
       ...objectToCamel(movie),
       rating: Number(movie.rating),
       userRating: Number(movie.user_rating),
+      yearOfRelease: Number(movie.year_of_release),
     };
 
     return result;
@@ -177,6 +178,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
       ...objectToCamel(movie),
       genres: genresResult.rows.map((row) => row.name),
       rating: Number(movie.rating),
+      userRating: Number(movie.user_rating),
       yearOfRelease: Number(movie.year_of_release),
     };
 
@@ -348,15 +350,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
 
     const pageOffset = (page - 1) * pageSize;
 
-    const result = await client.query<{
-      genres: string;
-      id: string;
-      rating: string;
-      slug: string;
-      title: string;
-      user_rating: string;
-      year_of_release: string;
-    }>(
+    const result = await client.query<MovieDb>(
       sql`
         SELECT m.*,
               string_agg(DISTINCT g.name, ',') AS genres,

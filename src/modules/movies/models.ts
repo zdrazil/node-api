@@ -9,11 +9,11 @@ export interface Movie {
 }
 
 export interface MovieDb {
-  genres: string[];
+  genres: string;
   id: string;
-  rating?: number;
+  rating?: string;
   slug: string;
   title: string;
-  user_rating?: number;
-  year_of_release: number;
+  user_rating?: string;
+  year_of_release: string;
 }
