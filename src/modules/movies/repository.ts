@@ -173,15 +173,21 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
 
     await client.end();
 
-    const result = {
+    const result: Movie = {
       ...objectToCamel(movie),
       genres: genresResult.rows.map((row) => row.name),
+      rating: Number(movie.rating),
+      yearOfRelease: Number(movie.year_of_release),
     };
 
     return result;
   }
 
-  async function update({ movie }: { movie: Movie }): Promise<boolean> {
+  async function update({
+    movie,
+  }: {
+    movie: Pick<Movie, 'genres' | 'id' | 'title' | 'yearOfRelease' | 'slug'>;
+  }): Promise<boolean> {
     const client = await db();
     await client.connect();
 
@@ -291,7 +297,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     await client.connect();
 
     // Exists
-    const result = await client.query(
+    const result = await client.query<{ count: number }>(
       sql`
         SELECT
           count(1)
@@ -305,7 +311,9 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
 
     await client.end();
 
-    return result.rowCount != null && result.rowCount > 0;
+    const firstRow = result.rows[0];
+
+    return firstRow == null ? false : firstRow.count > 0;
   }
 
   async function getAll({
