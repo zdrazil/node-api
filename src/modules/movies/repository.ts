@@ -355,25 +355,35 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
 
     const result = await client.query<MovieDb>(
       sql`
-        SELECT m.*,
-              string_agg(DISTINCT g.name, ',') AS genres,
-              round(avg(r.rating), 1) AS rating,
-              myr.rating AS user_rating
-        FROM movies m
-        LEFT JOIN genres g ON m.id = g.movie_id
-        LEFT JOIN ratings r ON m.id = r.movie_id
-        LEFT JOIN ratings myr ON m.id = myr.movie_id
-        AND myr.user_id = $1
-        WHERE ($title IS NULL
-              OR m.title like ('%' || $2 || '%'))
-          AND ($3 IS NULL
-              OR m.year_of_release = $3)
-        GROUP BY id,
-                user_rating ${orderClause}
-        LIMIT $4
-        OFFSET $5
+        SELECT
+          m.*,
+          string_agg(DISTINCT g.name, ',') AS genres,
+          round(avg(r.rating), 1) AS rating,
+          myr.rating AS user_rating
+        FROM
+          movies m
+          LEFT JOIN genres g ON m.id = g.movie_id
+          LEFT JOIN ratings r ON m.id = r.movie_id
+          LEFT JOIN ratings myr ON m.id = myr.movie_id
+          AND myr.user_id = $1
+        WHERE
+          (
+            $2::TEXT IS NULL
+            OR m.title LIKE ('%' || $2 || '%')
+          )
+          AND (
+            $3::INT IS NULL
+            OR m.year_of_release = $3
+          )
+        GROUP BY
+          id,
+          user_rating ${orderClause}
+        LIMIT
+          $4::INT
+        OFFSET
+          $5::INT
       `,
-      [userId, title, year, pageSize, pageOffset, orderClause],
+      [userId, title, year, pageSize, pageOffset],
     );
 
     return result.rows.map(
