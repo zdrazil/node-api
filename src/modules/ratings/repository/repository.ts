@@ -1,5 +1,11 @@
 import { sql } from '../../../tooling/sql';
 import { Client } from 'pg';
+import {
+  getRatingsByMovieAndUserId,
+  getRatingsByMovieId,
+} from './ratings.queries';
+import * as query from './ratings.queries';
+import { MovieRating } from '../models';
 
 export type RatingRepository = ReturnType<typeof createRatingRepository>;
 
@@ -12,21 +18,11 @@ export function createRatingRepository({ db }: { db: () => Promise<Client> }) {
     const client = await db();
     await client.connect();
 
-    const rating = await client.query<{ rating: number }>(
-      sql`
-        SELECT
-          round(avg(r.rating), 1) AS rating
-        FROM
-          ratings r
-        WHERE
-          movie_id = $1
-      `,
-      [movieId],
-    );
+    const rating = await getRatingsByMovieId.run({ movie_id: movieId }, client);
 
     await client.end();
 
-    return rating.rows[0]?.rating ?? 0;
+    return parseRatingNumber(rating);
   }
 
   async function getRatingByMovieAndUserId({
@@ -39,32 +35,14 @@ export function createRatingRepository({ db }: { db: () => Promise<Client> }) {
     const client = await db();
     await client.connect();
 
-    const rating = await client.query<{ rating: number }>(
-      sql`
-        SELECT
-          round(avg(r.rating), 1),
-          (
-            SELECT
-              rating
-            FROM
-              ratings
-            WHERE
-              movie_id = $1
-              AND user_id = $2
-            LIMIT
-              1
-          )
-        FROM
-          ratings r
-        WHERE
-          movie_id = $1;
-      `,
-      [movieId, userId],
+    const rating = await getRatingsByMovieAndUserId.run(
+      { movie_id: movieId, user_id: userId },
+      client,
     );
 
     await client.end();
 
-    return rating.rows[0]?.rating ?? 0;
+    return rating[0]?.rating ?? 0;
   }
 
   async function rateMovie({
@@ -79,23 +57,14 @@ export function createRatingRepository({ db }: { db: () => Promise<Client> }) {
     const client = await db();
     await client.connect();
 
-    const result = await client.query(
-      sql`
-        INSERT INTO
-          ratings (movie_id, user_id, rating)
-        VALUES
-          ($1, $2, $3)
-        ON CONFLICT (movie_id, user_id) DO
-        UPDATE
-        SET
-          rating = $3
-      `,
-      [movieId, userId, rating],
+    await query.rateMovie.run(
+      { movie_id: movieId, rating, user_id: userId },
+      client,
     );
 
     await client.end();
 
-    return (result.rowCount ?? 0) > 0;
+    return true;
   }
 
   async function deleteRating({
@@ -108,19 +77,14 @@ export function createRatingRepository({ db }: { db: () => Promise<Client> }) {
     const client = await db();
     await client.connect();
 
-    const result = await client.query(
-      sql`
-        DELETE FROM ratings
-        WHERE
-          movie_id = $1
-          AND user_id = $2
-      `,
-      [movieId, userId],
+    await query.deleteRatings.run(
+      { movie_id: movieId, user_id: userId },
+      client,
     );
 
     await client.end();
 
-    return (result.rowCount ?? 0) > 0;
+    return true;
   }
 
   async function getRatingsForUser({
@@ -131,24 +95,19 @@ export function createRatingRepository({ db }: { db: () => Promise<Client> }) {
     const client = await db();
     await client.connect();
 
-    const ratings = await client.query<MovieRating>(
-      sql`
-        SELECT
-          r.rating,
-          r.movie_id,
-          m.slug
-        FROM
-          ratings r
-          INNER JOIN movies m ON r.movie_id = m.id
-        WHERE
-          userid = $1
-      `,
-      [userId],
+    const ratings = await query.getRatingsForUser.run(
+      { user_id: userId },
+      client,
     );
 
     await client.end();
 
-    return ratings.rows;
+    return ratings.map((rating) => ({
+      id: rating.movie_id,
+      movieId: rating.movie_id,
+      rating: rating.rating,
+      slug: rating.slug,
+    }));
   }
 
   return {
@@ -158,4 +117,8 @@ export function createRatingRepository({ db }: { db: () => Promise<Client> }) {
     getRatingsForUser,
     rateMovie,
   };
+}
+function parseRatingNumber(rating: { rating: string | null }[]) {
+  const ratingNumber = rating[0]?.rating;
+  return ratingNumber != null ? Number(ratingNumber) : 0;
 }
