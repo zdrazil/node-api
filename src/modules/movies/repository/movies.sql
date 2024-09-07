@@ -118,3 +118,37 @@ WHERE
 :year_of_release::INTEGER IS NULL
     OR year_of_release =:year_of_release
   );
+
+/*
+@name getAllMovies
+*/
+SELECT
+  m.*,
+  string_agg(DISTINCT g.name, ',') AS genres,
+  round(avg(r.rating), 1) AS rating,
+  myr.rating AS user_rating
+FROM
+  movies m
+  LEFT JOIN genres g ON m.id = g.movie_id
+  LEFT JOIN ratings r ON m.id = r.movie_id
+  LEFT JOIN ratings myr ON m.id = myr.movie_id
+  AND myr.user_id =:user_id
+WHERE
+  (
+:title::TEXT IS NULL
+    OR m.title LIKE ('%' ||:title || '%')
+  )
+  AND (
+:year_of_release::INT IS NULL
+    OR m.year_of_release =:year_of_release
+  )
+GROUP BY
+  id,
+  user_rating,
+:order_column
+ORDER BY
+:order_column
+LIMIT
+:pageSize::INT
+OFFSET
+:pageOffset::INT;

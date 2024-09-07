@@ -158,26 +158,75 @@ describe('movies repository', () => {
   });
 
   describe('getAll', () => {
-    it('gets all movies', async () => {
-      const result = await repository.getAll({ userId });
+    it('gets movies', async () => {
+      const result = await repository.getAll({});
 
-      expect(result).toEqual([
-        {
-          genres: ['Action', 'Thriller'],
-          id: '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3',
-          rating: 4.5,
-          slug: 'movie-1',
-          title: 'Movie 1',
-          userRating: 4,
-          yearOfRelease: 2020,
-        },
-      ]);
+      expect(result[0]).toEqual({
+        genres: ['Action', 'Thriller'],
+        id: '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3',
+        rating: 4.5,
+        slug: 'movie-1',
+        title: 'Movie 1',
+        userRating: null,
+        yearOfRelease: 2020,
+      });
     });
 
-    it('returns empty array if no movies exist', async () => {
-      const result = await repository.getAll({ userId: randomUUID() });
+    it('gets user rating', async () => {
+      const result = await repository.getAll({ userId });
 
-      expect(result).toEqual([]);
+      expect(result[0]?.userRating).toEqual(4);
+    });
+
+    it('filters movies by title', async () => {
+      const result = await repository.getAll({ title: 'Movie 1' });
+
+      expect(result).toHaveLength(1);
+      expect(result[0]?.title).toContain('Movie 1');
+    });
+
+    it('filters movies by year of release', async () => {
+      const result = await repository.getAll({ year: 2020 });
+
+      expect(result).toHaveLength(1);
+      expect(result[0]?.yearOfRelease).toEqual(2020);
+    });
+  });
+
+  describe('getAll - paging', () => {
+    it('gets first page of movies', async () => {
+      const result = await repository.getAll({ page: 1, pageSize: 2 });
+
+      expect(result).toHaveLength(2);
+    });
+
+    it('gets second page of movies', async () => {
+      const result = await repository.getAll({ page: 2, pageSize: 2 });
+
+      expect(result).toHaveLength(1);
+    });
+
+    it('handles empty page', async () => {
+      const result = await repository.getAll({ page: 3, pageSize: 2 });
+
+      expect(result).toHaveLength(0);
+    });
+  });
+
+  describe('getAll - sorting', () => {
+    it('sorts movies by title ascending', async () => {
+      const result = await repository.getAll({
+        page: 1,
+        pageSize: 3,
+        sortField: 'title',
+        sortOrder: 'asc',
+      });
+
+      console.log(result);
+
+      expect(result[0]?.title).toBe('Movie 1');
+      expect(result[1]?.title).toBe('Movie 2');
+      expect(result[2]?.title).toBe('Movie 3');
     });
   });
 
