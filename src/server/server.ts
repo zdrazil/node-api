@@ -16,6 +16,7 @@ import { createRatingController } from '../modules/ratings/controller';
 import { createMovieController } from '../modules/movies/controller';
 import { createIdentityController } from '../modules/identity/controller';
 import pg from 'pg';
+import { createHealthController } from '../modules/health';
 
 export async function createServer(fastify: FastifyInstance) {
   await fastify.register(Helmet, {
@@ -58,6 +59,7 @@ async function createRoutes({ fastify }: { fastify: FastifyInstance }) {
   await createRatingController(fastify, { ratingService });
   await createMovieController(fastify, { movieService });
   await createIdentityController(fastify);
+  await createHealthController(fastify);
 }
 
 const __filename = fileURLToPath(import.meta.url);
