@@ -10,7 +10,7 @@ import { Role } from './modules/api/authorization/roles';
 declare module '@fastify/jwt' {
   interface FastifyJWT {
     payload: JwtPayload; // payload type is used for signing and verifying
-    user: {
+    user?: {
       admin?: boolean;
       email: string;
       id: number;

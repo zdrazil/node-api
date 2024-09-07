@@ -19,6 +19,7 @@ import {
   GetAllMoviesResponseDto,
   getAllMoviesResponseDtoSchema,
 } from './getAllMovies/schema';
+import { randomUUID } from 'crypto';
 
 interface Dependencies {
   movieService: MovieService;
@@ -92,8 +93,9 @@ export async function createMovieController(
 
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
-      const { order, page, perPage, sortBy, title, year } = req.params;
-      const userId = req.user.userId;
+      const { order, page, perPage, sortBy, title, year } = req.query;
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      const userId = req.user?.userId;
       const cancellationToken = req.raw.aborted;
 
       const movies = await movieService.getAll({
@@ -125,7 +127,7 @@ export async function createMovieController(
     method: 'GET',
     schema: {
       description: 'Get all movies',
-      params: getAllMoviesRequestDtoSchema,
+      querystring: getAllMoviesRequestDtoSchema,
       response: {
         200: getAllMoviesResponseDtoSchema,
       },
