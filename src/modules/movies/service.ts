@@ -1,4 +1,4 @@
-import { RatingRepository } from '../ratings/repository';
+import { RatingRepository } from '../ratings/repository/repository';
 import { Movie } from './models';
 import { MovieRepository } from './repository/repository';
 

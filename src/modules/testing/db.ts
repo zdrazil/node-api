@@ -5,7 +5,7 @@ import path from 'node:path';
 import fastifyPostgres from '@fastify/postgres';
 import { execSync } from 'node:child_process';
 import { createMovieRepository } from '../movies/repository/repository';
-import { createRatingRepository } from '../ratings/repository';
+import { createRatingRepository } from '../ratings/repository/repository';
 import { createMovieService } from '../movies/service';
 import { createRatingService } from '../ratings/service';
 import { createRatingController } from '../ratings/controller';
