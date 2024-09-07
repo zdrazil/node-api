@@ -15,7 +15,7 @@ import { createRatingService } from '../modules/ratings/service';
 import { createRatingController } from '../modules/ratings/controller';
 import { createMovieController } from '../modules/movies/controller';
 import { createIdentityController } from '../modules/identity/controller';
-import pg, { Client } from 'pg';
+import { Client } from 'pg';
 
 export async function createServer(fastify: FastifyInstance) {
   await fastify.register(Helmet, {
@@ -28,30 +28,22 @@ export async function createServer(fastify: FastifyInstance) {
     origin: false,
   });
 
-  const db = new Client({
-    connectionString: env.db.url,
-  });
-
   // Auto-load plugins
   await fastify.register(AutoLoad, {
     dir: path.join(__dirname, 'plugins'),
     dirNameRoutePrefix: false,
   });
 
-  await createRoutes({ db, fastify });
+  await createRoutes({ fastify });
 
   await fastify.register(UnderPressure);
 
   return fastify.withTypeProvider<TypeBoxTypeProvider>();
 }
 
-async function createRoutes({
-  db,
-  fastify,
-}: {
-  db: Client;
-  fastify: FastifyInstance;
-}) {
+async function createRoutes({ fastify }: { fastify: FastifyInstance }) {
+  const db = async () => new Client({ connectionString: env.db.url });
+
   const movieRepository = createMovieRepository({ db });
   const ratingRepository = createRatingRepository({ db });
   const movieService = createMovieService({

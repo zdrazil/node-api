@@ -2,7 +2,6 @@ import Fastify, { FastifyInstance } from 'fastify';
 import Cors from '@fastify/cors';
 import AutoLoad from '@fastify/autoload';
 import path from 'node:path';
-import fastifyPostgres from '@fastify/postgres';
 import { execSync } from 'node:child_process';
 import { createMovieRepository } from '../movies/repository/repository';
 import { createRatingRepository } from '../ratings/repository/repository';
@@ -15,15 +14,11 @@ import {
   DockerComposeEnvironment,
   StartedDockerComposeEnvironment,
 } from 'testcontainers';
-import pg from 'pg';
+import pg, { Client } from 'pg';
 
-async function createRoutes({
-  db,
-  fastify,
-}: {
-  db: pg.Client;
-  fastify: FastifyInstance;
-}) {
+async function createRoutes({ fastify }: { fastify: FastifyInstance }) {
+  const db = async () => new Client({ connectionString: dbUrl });
+
   const movieRepository = createMovieRepository({ db });
   const ratingRepository = createRatingRepository({ db });
   const movieService = createMovieService({
@@ -85,14 +80,12 @@ export async function startServer() {
     origin: false,
   });
 
-  const db = new Client({ connectionString: dbUrl });
-
   await fastify.register(AutoLoad, {
     dir: path.join(process.cwd(), 'src', 'server', 'plugins'),
     dirNameRoutePrefix: false,
   });
 
-  await createRoutes({ db, fastify });
+  await createRoutes({ fastify });
 
   return { dbEnvironment, fastify };
 }
