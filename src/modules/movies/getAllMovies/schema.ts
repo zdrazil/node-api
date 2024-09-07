@@ -2,11 +2,9 @@ import { Static, Type } from '@sinclair/typebox';
 import { pagedRequestDescription } from '../../api/paging';
 import { sortDirectionSchema } from '../../api/sortDirection';
 import { movieResponseDtoSchema } from '../response';
+import { StringEnum } from '../../../types';
 
-const sortFieldSchema = Type.Union([
-  Type.Literal('title'),
-  Type.Literal('year'),
-]);
+const sortFieldSchema = StringEnum(['title', 'year']);
 
 export type SortField = Static<typeof sortFieldSchema>;
 

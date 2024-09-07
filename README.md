@@ -58,6 +58,8 @@ Use `yarn db:codegen -w` to generate TypeScript types and methods for your SQL q
 
 Swagger docs are available at `http://localhost:3000/api-docs`.
 
+Most of the endpoints are locked behind a simple authentication scheme. Use the token endpoint to get a token and then click on the lock icon in the top right corner to authenticate.
+
 ## Architecture
 
 Code is organized into [vertical slices](https://vladimirzdrazil.com/til/software-architecture/vertical-slice-architecture/). Each slice contains all the layers needed for a feature. For example, the movie slice contains the following layers:
@@ -92,7 +94,7 @@ To test database interactions, we use a separate test database that is created a
 ## Unsolved problems
 
 - [ ] No real security measures are implemented.
-- [ ] Authentication and authorization are very basic and insecure.
+- [ ] Authentication and authorization are very basic and insecure. We're using a hardcoded secret for JWT and a simple token-based authentication scheme.
 - [ ] Performance and caching are not considered.
 - [ ] No logging or monitoring.
 - [ ] There is some rudimentary error handling, but I didn't spend much time on it.

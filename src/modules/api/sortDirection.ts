@@ -1,8 +1,5 @@
-import { Literal, Static, Type } from '@sinclair/typebox';
+import { Static } from '@sinclair/typebox';
+import { StringEnum } from '../../types';
 
 export type SortDirection = Static<typeof sortDirectionSchema>;
-export const sortDirectionSchema = Type.Union([
-  Literal('asc'),
-  Literal('desc'),
-  Literal('none'),
-]);
+export const sortDirectionSchema = StringEnum(['asc', 'desc', 'none']);
