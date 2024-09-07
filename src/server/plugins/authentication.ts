@@ -1,9 +1,7 @@
 import fastifyJwt from '@fastify/jwt';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
-
-// TODO: Store and load this securely
-const tokenSecret = 'ForTheLoveOfGodStoreAndLoadThisSecurely';
+import { env } from '../../config/env';
 
 export type Authenticate = (
   request: FastifyRequest,
@@ -12,7 +10,7 @@ export type Authenticate = (
 
 async function authenticationPlugin(fastify: FastifyInstance) {
   await fastify.register(fastifyJwt, {
-    secret: tokenSecret,
+    secret: env.tokenSecret,
   });
 
   fastify.decorate(

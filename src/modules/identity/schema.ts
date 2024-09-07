@@ -35,3 +35,10 @@ export interface JwtPayload {
   trustedMember?: boolean;
   userId: string;
 }
+
+export const createJwtTokenResponseDtoSchema = Type.Object({
+  token: Type.String({
+    description: 'JWT token',
+    example: 'eyJhbGciOiJIUz',
+  }),
+});

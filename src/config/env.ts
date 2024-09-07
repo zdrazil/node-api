@@ -23,6 +23,7 @@ const schema = Type.Object({
   POSTGRES_PASSWORD: Type.String(),
   POSTGRES_URL: Type.String(),
   POSTGRES_USER: Type.String(),
+  TOKEN_SECRET: Type.String(),
 });
 
 const internalEnv = envSchema<Static<typeof schema>>({
@@ -44,5 +45,6 @@ export const env = {
     host: internalEnv.HOST,
     port: internalEnv.PORT,
   },
+  tokenSecret: internalEnv.TOKEN_SECRET,
   version: process.env.npm_package_version ?? '0.0.0',
 };
