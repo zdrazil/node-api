@@ -38,16 +38,4 @@ export async function createIdentityController(fastify: FastifyRouteInstance) {
     },
     url: tokenPath,
   });
-
-  fastify.withTypeProvider<TypeBoxTypeProvider>().route({
-    handler: async (req, res) => {
-      await res.send({ token: 'hello' });
-    },
-    method: 'GET',
-    schema: {
-      description: 'Create a JWT token',
-      tags: ['identity'],
-    },
-    url: tokenPath,
-  });
 }

@@ -14,10 +14,10 @@ import {
   DockerComposeEnvironment,
   StartedDockerComposeEnvironment,
 } from 'testcontainers';
-import pg, { Client } from 'pg';
+import pg from 'pg';
 
 async function createRoutes({ fastify }: { fastify: FastifyInstance }) {
-  const db = async () => new Client({ connectionString: dbUrl });
+  const db = async () => new pg.Client({ connectionString: dbUrl });
 
   const movieRepository = createMovieRepository({ db });
   const ratingRepository = createRatingRepository({ db });

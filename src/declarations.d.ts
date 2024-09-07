@@ -5,7 +5,7 @@ import { Authenticate } from './server/plugins/authentication';
 import { Authorize } from './server/plugins/authorization';
 import '@fastify/jwt';
 import { JwtPayload } from './modules/identity/schema';
-import { Role } from './modules/authorization/roles';
+import { Role } from './modules/api/authorization/roles';
 
 declare module '@fastify/jwt' {
   interface FastifyJWT {
