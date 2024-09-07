@@ -76,7 +76,7 @@ describe('movies repository', () => {
       expect(result).toEqual({
         ...movie,
         rating: undefined,
-        userRating: undefined,
+        userRating: null,
       });
     });
   });
