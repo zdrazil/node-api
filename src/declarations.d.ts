@@ -33,8 +33,4 @@ declare module 'fastify' {
     verifyAdmin: Authorize;
     verifyTrustedMember: Authorize;
   }
-
-  // interface FastifyContextConfig {
-  //   allowedRoles?: Role[];
-  // }
 }
