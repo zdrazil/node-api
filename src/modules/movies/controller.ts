@@ -1,7 +1,7 @@
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { FastifyRouteInstance } from '../../types';
 import { createIdDtoSchema, isUuid } from '../api/id';
-import { ConflictException } from '../exceptions/exceptions';
+import { ConflictException } from '../api/exceptions';
 import {
   createMovieRequestDtoSchema,
   createMovieRequestToMovie,

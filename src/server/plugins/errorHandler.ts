@@ -4,8 +4,8 @@ import {
   ApiErrorResponse,
   apiErrorResponseSchema,
 } from '../../modules/api/apiErrorResponse';
-import { getRequestId } from '../../modules/app/requestContext';
-import { ExceptionBase } from '../../modules/exceptions/exceptions';
+import { getRequestId } from '../../modules/api/requestContext';
+import { ExceptionBase } from '../../modules/api/exceptions';
 
 const fastifyErrorCodesMap: Record<
   string,

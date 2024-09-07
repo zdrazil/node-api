@@ -1,4 +1,4 @@
-import { getRequestId } from '../app/requestContext';
+import { getRequestId } from './requestContext';
 
 interface SerializedException {
   cause?: string;

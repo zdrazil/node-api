@@ -1,6 +1,6 @@
 import { Static, Type } from '@sinclair/typebox';
-import { pagedRequestDescription } from '../../paging';
-import { sortDirectionSchema } from '../../sortDirection';
+import { pagedRequestDescription } from '../../api/paging';
+import { sortDirectionSchema } from '../../api/sortDirection';
 import { movieResponseDtoSchema } from '../response';
 
 const sortFieldSchema = Type.Union([

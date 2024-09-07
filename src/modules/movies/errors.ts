@@ -1,4 +1,4 @@
-import { ConflictException } from '../exceptions/exceptions';
+import { ConflictException } from '../api/exceptions';
 
 export class MovieAlreadyExistsError extends ConflictException {
   static readonly message = 'Movie already exists';

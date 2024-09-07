@@ -1,5 +1,5 @@
 import { Movie } from '../models';
-import { SortDirection } from '../../sortDirection';
+import { SortDirection } from '../../api/sortDirection';
 import { SortField } from '../getAllMovies/schema';
 import { Client } from 'pg';
 import { objectToCamel } from 'ts-case-convert';
