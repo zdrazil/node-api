@@ -15,7 +15,7 @@ import { createRatingService } from '../modules/ratings/service';
 import { createRatingController } from '../modules/ratings/controller';
 import { createMovieController } from '../modules/movies/controller';
 import { createIdentityController } from '../modules/identity/controller';
-import { Client } from 'pg';
+import pg from 'pg';
 
 export async function createServer(fastify: FastifyInstance) {
   await fastify.register(Helmet, {
@@ -42,7 +42,7 @@ export async function createServer(fastify: FastifyInstance) {
 }
 
 async function createRoutes({ fastify }: { fastify: FastifyInstance }) {
-  const db = async () => new Client({ connectionString: env.db.url });
+  const db = async () => new pg.Client({ connectionString: env.db.url });
 
   const movieRepository = createMovieRepository({ db });
   const ratingRepository = createRatingRepository({ db });
