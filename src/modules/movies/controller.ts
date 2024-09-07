@@ -19,6 +19,7 @@ import {
   GetAllMoviesResponseDto,
   getAllMoviesResponseDtoSchema,
 } from './getAllMovies/schema';
+import { securityDefinitions } from '../api/authorization/securityDefinition';
 
 interface Dependencies {
   movieService: MovieService;
@@ -56,6 +57,7 @@ export async function createMovieController(
       response: {
         200: movieResponseDtoSchema,
       },
+      security: [{ BearerAuth: [] }],
       tags: ['movies'],
     },
     url: movieEndpoints.create,

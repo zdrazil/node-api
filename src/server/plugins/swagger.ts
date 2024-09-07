@@ -6,26 +6,34 @@ import fp from 'fastify-plugin';
 async function swaggerGeneratorPlugin(fastify: FastifyInstance) {
   await fastify.register(Swagger, {
     openapi: {
+      components: {
+        securitySchemes: {
+          BearerAuth: {
+            bearerFormat: 'JWT',
+            description:
+              'RSA256 JWT signed by private key, with username in payload',
+            scheme: 'bearer',
+            type: 'http',
+          },
+        },
+      },
       info: {
-        description:
-          'The Swagger API documentation for the fastify-boilerplate project.',
-        title: 'fastify-boilerplate',
+        description: 'The Swagger API documentation for the node-api project.',
+        title: 'node-api',
         version: process.env.npm_package_version ?? '0.0.0',
       },
       openapi: '3.1.0',
     },
-    // If you don't need to generate client types you could keep swagger
-    // swagger: {
-    //   info: {
-    //     title: 'fastify-boilerplate',
-    //     description:
-    //       'The Swagger API documentation for the fastify-boilerplate project.',
-    //     version: '0.1.0',
-    //   },
-    //   schemes: ['http', 'https'],
-    //   consumes: ['application/json'],
-    //   produces: ['application/json'],
-    // },
+    swagger: {
+      consumes: ['application/json'],
+      info: {
+        description: 'The Swagger API documentation for the node-api project.',
+        title: 'node-api',
+        version: '0.1.0',
+      },
+      produces: ['application/json'],
+      schemes: ['http', 'https'],
+    },
   });
 
   await fastify.register(SwaggerUI, {
