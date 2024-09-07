@@ -25,5 +25,6 @@
   "inlineSQL.dbHost": "localhost",
   "inlineSQL.dbPort": 5432,
   "inlineSQL.dbUser": "admin",
-  "inlineSQL.dbPassword": "test"
+  "inlineSQL.dbPassword": "test",
+  "pgFormatter.configFile": "${workspaceFolder}/.pg_format"
 }
