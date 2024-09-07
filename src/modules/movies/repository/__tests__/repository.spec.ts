@@ -222,8 +222,6 @@ describe('movies repository', () => {
         sortField: 'title',
       });
 
-      console.log(result);
-
       expect(result[0]?.title).toBe('Movie 1');
       expect(result[1]?.title).toBe('Movie 2');
       expect(result[2]?.title).toBe('Movie 3');
@@ -248,8 +246,6 @@ describe('movies repository', () => {
         sortDirection: 'asc',
         sortField: 'year',
       });
-
-      console.log(result);
 
       expect(result[0]?.yearOfRelease).toBe(2019);
       expect(result[1]?.yearOfRelease).toBe(2020);

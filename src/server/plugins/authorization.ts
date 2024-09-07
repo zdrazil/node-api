@@ -18,32 +18,25 @@ async function authorizationPlugin(fastify: FastifyInstance) {
 
   fastify.decorate(
     'verifyAdmin',
-    (
-      request: FastifyRequest,
-      reply: FastifyReply,
-      done: HookHandlerDoneFunction,
-    ) => {
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      await fastify.authenticate(request, reply);
+
       const isAdmin = request.user.admin ?? false;
       if (!isAdmin) {
-        done(new Error('Unauthorized'));
+        throw new Error('Unauthorized');
       }
-      done();
     },
   );
 
   fastify.decorate(
     'verifyTrustedMember',
-    (
-      request: FastifyRequest,
-      reply: FastifyReply,
-      done: HookHandlerDoneFunction,
-    ) => {
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      await fastify.authenticate(request, reply);
+
       const isTrustedMember = request.user.trustedMember ?? false;
       if (!isTrustedMember) {
-        done(new Error('Unauthorized'));
+        throw new Error('Unauthorized');
       }
-
-      done();
     },
   );
 }

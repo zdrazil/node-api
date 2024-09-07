@@ -5,6 +5,8 @@ const claimsSchema = Type.Object({
   trustedMember: Type.Optional(Type.Boolean()),
 });
 
+export type Claims = Static<typeof claimsSchema>;
+
 export const createJwtTokenRequestDtoSchema = Type.Object({
   customClaims: Type.Optional(claimsSchema),
   email: Type.String({
@@ -19,6 +21,10 @@ export const createJwtTokenRequestDtoSchema = Type.Object({
     format: 'uuid',
   }),
 });
+
+export type CreateJwtTokenRequestDto = Static<
+  typeof createJwtTokenRequestDtoSchema
+>;
 
 export interface JwtPayload {
   admin?: boolean;

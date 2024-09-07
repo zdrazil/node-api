@@ -22,8 +22,6 @@ describe('app', () => {
       url: '/api/movies',
     });
 
-    console.log('status code: ', response.statusCode);
-    console.log('body: ', response.body);
     expect(response.statusCode).toBe(200);
   });
 });
