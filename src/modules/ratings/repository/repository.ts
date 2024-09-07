@@ -22,7 +22,7 @@ export function createRatingRepository({ db }: { db: () => Promise<Client> }) {
 
     await client.end();
 
-    return parseRatingNumber(rating);
+    return rating[0]?.rating ?? 0;
   }
 
   async function getRatingByMovieAndUserId({
@@ -121,8 +121,4 @@ export function createRatingRepository({ db }: { db: () => Promise<Client> }) {
     getRatingsForUser,
     rateMovie,
   };
-}
-function parseRatingNumber(rating: { rating: string | null }[]) {
-  const ratingNumber = rating[0]?.rating;
-  return ratingNumber != null ? Number(ratingNumber) : 0;
 }

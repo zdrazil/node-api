@@ -8,7 +8,7 @@ export interface IGetRatingsByMovieIdParams {
 
 /** 'GetRatingsByMovieId' return type */
 export interface IGetRatingsByMovieIdResult {
-  rating: string | null;
+  rating: number | null;
 }
 
 /** 'GetRatingsByMovieId' query type */
@@ -17,13 +17,13 @@ export interface IGetRatingsByMovieIdQuery {
   result: IGetRatingsByMovieIdResult;
 }
 
-const getRatingsByMovieIdIR: any = {"params":[{"locs":[{"a":85,"b":93}],"name":"movie_id","required":false,"transform":{"type":"scalar"}}],"statement":"SELECT\n    round(avg(r.rating), 1) AS rating\nFROM\n    ratings r\nWHERE\n    movie_id = :movie_id","usedParamSet":{"movie_id":true}};
+const getRatingsByMovieIdIR: any = {"usedParamSet":{"movie_id":true},"params":[{"name":"movie_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":87,"b":95}]}],"statement":"SELECT\n    round(avg(r.rating))::int AS rating\nFROM\n    ratings r\nWHERE\n    movie_id = :movie_id"};
 
 /**
  * Query generated from SQL:
  * ```
  * SELECT
- *     round(avg(r.rating), 1) AS rating
+ *     round(avg(r.rating))::int AS rating
  * FROM
  *     ratings r
  * WHERE
@@ -51,7 +51,7 @@ export interface IGetRatingsByMovieAndUserIdQuery {
   result: IGetRatingsByMovieAndUserIdResult;
 }
 
-const getRatingsByMovieAndUserIdIR: any = {"params":[{"locs":[{"a":142,"b":150},{"a":244,"b":252}],"name":"movie_id","required":false,"transform":{"type":"scalar"}},{"locs":[{"a":178,"b":185}],"name":"user_id","required":false,"transform":{"type":"scalar"}}],"statement":"SELECT\n    round(avg(r.rating), 1),\n(\n        SELECT\n            rating\n        FROM\n            ratings\n        WHERE\n            movie_id = :movie_id\n            AND user_id = :user_id\n        LIMIT 1)\nFROM\n    ratings r\nWHERE\n    movie_id = :movie_id","usedParamSet":{"movie_id":true,"user_id":true}};
+const getRatingsByMovieAndUserIdIR: any = {"usedParamSet":{"movie_id":true,"user_id":true},"params":[{"name":"movie_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":142,"b":150},{"a":244,"b":252}]},{"name":"user_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":178,"b":185}]}],"statement":"SELECT\n    round(avg(r.rating), 1),\n(\n        SELECT\n            rating\n        FROM\n            ratings\n        WHERE\n            movie_id = :movie_id\n            AND user_id = :user_id\n        LIMIT 1)\nFROM\n    ratings r\nWHERE\n    movie_id = :movie_id"};
 
 /**
  * Query generated from SQL:
@@ -92,7 +92,7 @@ export interface IRateMovieQuery {
   result: IRateMovieResult;
 }
 
-const rateMovieIR: any = {"params":[{"locs":[{"a":59,"b":67}],"name":"movie_id","required":false,"transform":{"type":"scalar"}},{"locs":[{"a":70,"b":77}],"name":"user_id","required":false,"transform":{"type":"scalar"}},{"locs":[{"a":80,"b":86},{"a":156,"b":162}],"name":"rating","required":false,"transform":{"type":"scalar"}}],"statement":"INSERT INTO ratings(movie_id, user_id, rating)\n    VALUES (:movie_id, :user_id, :rating)\nON CONFLICT (movie_id, user_id)\n    DO UPDATE SET\n        rating = :rating","usedParamSet":{"movie_id":true,"rating":true,"user_id":true}};
+const rateMovieIR: any = {"usedParamSet":{"movie_id":true,"user_id":true,"rating":true},"params":[{"name":"movie_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":59,"b":67}]},{"name":"user_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":70,"b":77}]},{"name":"rating","required":false,"transform":{"type":"scalar"},"locs":[{"a":80,"b":86},{"a":156,"b":162}]}],"statement":"INSERT INTO ratings(movie_id, user_id, rating)\n    VALUES (:movie_id, :user_id, :rating)\nON CONFLICT (movie_id, user_id)\n    DO UPDATE SET\n        rating = :rating"};
 
 /**
  * Query generated from SQL:
@@ -122,7 +122,7 @@ export interface IDeleteRatingsQuery {
   result: IDeleteRatingsResult;
 }
 
-const deleteRatingsIR: any = {"params":[{"locs":[{"a":37,"b":45}],"name":"movie_id","required":false,"transform":{"type":"scalar"}},{"locs":[{"a":65,"b":72}],"name":"user_id","required":false,"transform":{"type":"scalar"}}],"statement":"DELETE FROM ratings\nWHERE movie_id = :movie_id\n    AND user_id = :user_id","usedParamSet":{"movie_id":true,"user_id":true}};
+const deleteRatingsIR: any = {"usedParamSet":{"movie_id":true,"user_id":true},"params":[{"name":"movie_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":37,"b":45}]},{"name":"user_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":65,"b":72}]}],"statement":"DELETE FROM ratings\nWHERE movie_id = :movie_id\n    AND user_id = :user_id"};
 
 /**
  * Query generated from SQL:
@@ -153,7 +153,7 @@ export interface IGetRatingsForUserQuery {
   result: IGetRatingsForUserResult;
 }
 
-const getRatingsForUserIR: any = {"params":[{"locs":[{"a":132,"b":139}],"name":"user_id","required":false,"transform":{"type":"scalar"}}],"statement":"SELECT\n    r.rating,\n    r.movie_id,\n    m.slug\nFROM\n    ratings r\n    INNER JOIN movies m ON r.movie_id = m.id\nWHERE\n    user_id = :user_id","usedParamSet":{"user_id":true}};
+const getRatingsForUserIR: any = {"usedParamSet":{"user_id":true},"params":[{"name":"user_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":132,"b":139}]}],"statement":"SELECT\n    r.rating,\n    r.movie_id,\n    m.slug\nFROM\n    ratings r\n    INNER JOIN movies m ON r.movie_id = m.id\nWHERE\n    user_id = :user_id"};
 
 /**
  * Query generated from SQL:

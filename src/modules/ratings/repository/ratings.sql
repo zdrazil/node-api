@@ -2,7 +2,7 @@
  @name getRatingsByMovieId
  */
 SELECT
-    round(avg(r.rating), 1) AS rating
+    round(avg(r.rating))::int AS rating
 FROM
     ratings r
 WHERE
