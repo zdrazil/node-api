@@ -10,28 +10,28 @@ import {
 
 const cancellationToken = false;
 
+const movie1: Movie = {
+  genres: ['Action', 'Thriller'],
+  id: '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3',
+  rating: 4,
+  slug: 'movie-1',
+  title: 'Movie 1',
+  userRating: 4,
+  yearOfRelease: 2019,
+};
+
+const movie2: Movie = {
+  genres: ['Comedy'],
+  id: 'f6b3b6e7-3d1e-4f4f-8b4f-2b3f6c4b6e9a',
+  rating: 3,
+  slug: 'movie-2',
+  title: 'Movie 2',
+  userRating: 3,
+  yearOfRelease: 2020,
+};
+
 describe('movies repository', () => {
   const userId = '2ee75e90-f4c6-4de2-8580-300f76fff238';
-
-  const movie1: Movie = {
-    genres: ['Action', 'Thriller'],
-    id: '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3',
-    rating: 4,
-    slug: 'movie-1',
-    title: 'Movie 1',
-    userRating: 4,
-    yearOfRelease: 2019,
-  };
-
-  const movie2: Movie = {
-    genres: ['Comedy'],
-    id: 'f6b3b6e7-3d1e-4f4f-8b4f-2b3f6c4b6e9a',
-    rating: 3,
-    slug: 'movie-2',
-    title: 'Movie 2',
-    userRating: 3,
-    yearOfRelease: 2020,
-  };
 
   let dbEnv: StartedDockerComposeEnvironment;
   let movieRepository: MovieRepository;
