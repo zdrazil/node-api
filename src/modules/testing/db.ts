@@ -56,14 +56,25 @@ export async function startDbEnvironment() {
     env: { ...process.env, DBMATE_DATABASE_URL: dbUrl },
   });
 
-  execSync('yarn run db:seed', {
-    env: { ...process.env, DBMATE_DATABASE_URL: dbUrl },
-  });
+  // execSync('yarn run db:seed', {
+  //   env: { ...process.env, DBMATE_DATABASE_URL: dbUrl },
+  // });
 
   return db;
 }
 
 export const createDb = async () => new pg.Client({ connectionString: dbUrl });
+
+export async function clearTables() {
+  const client = await createDb();
+  await client.connect();
+
+  await client.query('TRUNCATE TABLE movies CASCADE');
+  await client.query('TRUNCATE TABLE ratings CASCADE');
+  await client.query('TRUNCATE TABLE genres CASCADE');
+
+  await client.end();
+}
 
 export async function startServer() {
   const dbEnvironment = await startDbEnvironment();

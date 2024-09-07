@@ -28,7 +28,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     movie,
   }: {
     cancellationToken: boolean;
-    movie: Movie;
+    movie: Pick<Movie, 'id' | 'slug' | 'title' | 'yearOfRelease' | 'genres'>;
   }): Promise<boolean> {
     const client = await db();
     await client.connect();
@@ -268,6 +268,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
         ...objectToCamel(movie),
         genres: movie.genres?.split(',') ?? [],
         rating: stringToNumber(movie.rating),
+        userRating: movie.user_rating,
       }),
     );
   }

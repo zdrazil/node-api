@@ -1,71 +1,74 @@
-import { createDb, startDbEnvironment } from '../../../testing/db';
+import { clearTables, createDb, startDbEnvironment } from '../../../testing/db';
 import { StartedDockerComposeEnvironment } from 'testcontainers';
 import { Movie } from '../../models';
 import { createMovieRepository, MovieRepository } from '../repository';
 import { randomUUID } from 'crypto';
+import {
+  createRatingRepository,
+  RatingRepository,
+} from '../../../ratings/repository/repository';
 
 const cancellationToken = false;
 
 describe('movies repository', () => {
   const userId = '2ee75e90-f4c6-4de2-8580-300f76fff238';
 
-  const movie: Movie = {
+  const movie1: Movie = {
     genres: ['Action', 'Thriller'],
     id: '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3',
-    rating: 4.5,
+    rating: 4,
     slug: 'movie-1',
     title: 'Movie 1',
     userRating: 4,
+    yearOfRelease: 2019,
+  };
+
+  const movie2: Movie = {
+    genres: ['Comedy'],
+    id: 'f6b3b6e7-3d1e-4f4f-8b4f-2b3f6c4b6e9a',
+    rating: 3,
+    slug: 'movie-2',
+    title: 'Movie 2',
+    userRating: 3,
     yearOfRelease: 2020,
   };
 
   let dbEnv: StartedDockerComposeEnvironment;
-  let repository: MovieRepository;
+  let movieRepository: MovieRepository;
+  let ratingRepository: RatingRepository;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     dbEnv = await startDbEnvironment();
-    repository = createMovieRepository({ db: createDb });
+    movieRepository = createMovieRepository({ db: createDb });
+    ratingRepository = createRatingRepository({ db: createDb });
   });
 
   afterEach(async () => {
+    await clearTables();
+  });
+
+  afterAll(async () => {
     await dbEnv.down();
   });
 
-  describe('getById', () => {
-    it('gets a movie by id', async () => {
-      const id = '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3';
-
-      const result = await repository.getById({
-        cancellationToken,
-        id,
-        userId,
-      });
-
-      const expected: Movie = {
-        genres: ['Action', 'Thriller'],
-        id: '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3',
-        rating: 4.5,
-        slug: 'movie-1',
-        title: 'Movie 1',
-        userRating: 4,
-        yearOfRelease: 2020,
-      };
-      expect(result).toEqual(expected);
+  const prepareMovie = async (movie: Movie) => {
+    const { genres, id, slug, title, userRating, yearOfRelease } = movie;
+    await movieRepository.create({
+      cancellationToken,
+      movie: { genres, id, slug, title, yearOfRelease },
     });
 
-    it('returns undefined if movie does not exist', async () => {
-      const id = randomUUID();
-      const userId = randomUUID();
-
-      const result = await repository.getById({
+    if (userRating != null) {
+      await ratingRepository.rateMovie({
         cancellationToken,
-        id,
+        movieId: id,
+        rating: userRating,
         userId,
       });
+    }
 
-      expect(result).toBeUndefined();
-    });
-  });
+    return movie;
+  };
 
   describe('create', () => {
     it('creates a movie', async () => {
@@ -77,8 +80,9 @@ describe('movies repository', () => {
         yearOfRelease: 2021,
       };
 
-      await repository.create({ cancellationToken, movie });
-      const result = await repository.getById({
+      await prepareMovie(movie);
+
+      const result = await movieRepository.getById({
         cancellationToken,
         id: movie.id,
         userId: randomUUID(),
@@ -92,31 +96,53 @@ describe('movies repository', () => {
     });
   });
 
+  describe('getById', () => {
+    it('gets a movie by id', async () => {
+      const movie = await prepareMovie(movie1);
+      const { id } = movie;
+
+      const result = await movieRepository.getById({
+        cancellationToken,
+        id,
+        userId,
+      });
+
+      expect(result).toEqual(movie);
+    });
+
+    it('returns undefined if movie does not exist', async () => {
+      const id = randomUUID();
+      const userId = randomUUID();
+
+      const result = await movieRepository.getById({
+        cancellationToken,
+        id,
+        userId,
+      });
+
+      expect(result).toBeUndefined();
+    });
+  });
+
   describe('getBySlug', () => {
     it('gets a movie by slug', async () => {
-      const slug = 'movie-1';
+      const movie = await prepareMovie(movie1);
+      const { slug } = movie;
 
-      const result = await repository.getBySlug({
+      const result = await movieRepository.getBySlug({
         cancellationToken,
         slug,
         userId,
       });
 
-      const expected: Movie = {
-        genres: ['Action', 'Thriller'],
-        id: '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3',
-        rating: 4.5,
-        slug: 'movie-1',
-        title: 'Movie 1',
-        userRating: 4,
-        yearOfRelease: 2020,
-      };
-      expect(result).toEqual(expected);
+      expect(result).toEqual(movie);
     });
   });
 
   describe('update', () => {
     it('updates a movie', async () => {
+      const movie = await prepareMovie(movie1);
+
       const updatedMovie = {
         genres: ['Sci-Fi'],
         id: movie.id,
@@ -124,14 +150,14 @@ describe('movies repository', () => {
         title: 'New Movie',
         yearOfRelease: 2021,
       };
-      await repository.update({
+      await movieRepository.update({
         cancellationToken,
         movie: updatedMovie,
       });
 
-      const result = await repository.getById({
+      const result = await movieRepository.getById({
         cancellationToken,
-        id: movie.id,
+        id: movie1.id,
         userId,
       });
 
@@ -149,11 +175,12 @@ describe('movies repository', () => {
 
   describe('deleteById', () => {
     it('deletes a movie', async () => {
-      const id = movie.id;
+      const movie = await prepareMovie(movie1);
+      const { id } = movie;
 
-      await repository.deleteById({ cancellationToken, id });
+      await movieRepository.deleteById({ cancellationToken, id });
 
-      const result = await repository.getById({
+      const result = await movieRepository.getById({
         cancellationToken,
         id,
         userId,
@@ -165,9 +192,13 @@ describe('movies repository', () => {
 
   describe('existsById', () => {
     it('returns true if movie exists', async () => {
-      const id = '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3';
+      const movie = await prepareMovie(movie1);
+      const { id } = movie;
 
-      const result = await repository.existsById({ cancellationToken, id });
+      const result = await movieRepository.existsById({
+        cancellationToken,
+        id,
+      });
 
       expect(result).toBe(true);
     });
@@ -175,7 +206,10 @@ describe('movies repository', () => {
     it('returns false if movie does not exist', async () => {
       const id = randomUUID();
 
-      const result = await repository.existsById({ cancellationToken, id });
+      const result = await movieRepository.existsById({
+        cancellationToken,
+        id,
+      });
 
       expect(result).toBe(false);
     });
@@ -183,69 +217,77 @@ describe('movies repository', () => {
 
   describe('getAll', () => {
     it('gets movies', async () => {
-      const result = await repository.getAll({ cancellationToken });
+      const movie = await prepareMovie(movie1);
 
-      expect(result[0]).toEqual({
-        genres: ['Action', 'Thriller'],
-        id: '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3',
-        rating: 4.5,
-        slug: 'movie-1',
-        title: 'Movie 1',
-        userRating: null,
-        yearOfRelease: 2020,
+      const result = await movieRepository.getAll({
+        cancellationToken,
+        userId,
       });
-    });
 
-    it('gets user rating', async () => {
-      const result = await repository.getAll({ cancellationToken, userId });
-
-      expect(result[0]?.userRating).toEqual(4);
+      expect(result[0]).toEqual(movie);
     });
 
     it('filters movies by title', async () => {
-      const result = await repository.getAll({
+      await prepareMovie(movie1);
+      await prepareMovie(movie2);
+
+      const result = await movieRepository.getAll({
         cancellationToken,
-        title: 'Movie 1',
+        title: movie1.title,
       });
 
       expect(result).toHaveLength(1);
-      expect(result[0]?.title).toContain('Movie 1');
+      expect(result[0]?.title).toContain(movie1.title);
     });
 
     it('filters movies by year of release', async () => {
-      const result = await repository.getAll({ cancellationToken, year: 2020 });
+      await prepareMovie(movie1);
+      await prepareMovie(movie2);
+
+      const result = await movieRepository.getAll({
+        cancellationToken,
+        year: movie1.yearOfRelease,
+      });
 
       expect(result).toHaveLength(1);
-      expect(result[0]?.yearOfRelease).toEqual(2020);
+      expect(result[0]?.yearOfRelease).toEqual(movie1.yearOfRelease);
     });
   });
 
   describe('getAll - paging', () => {
     it('gets first page of movies', async () => {
-      const result = await repository.getAll({
+      await prepareMovie(movie1);
+      await prepareMovie(movie2);
+
+      const result = await movieRepository.getAll({
         cancellationToken,
         page: 1,
-        pageSize: 2,
+        pageSize: 1,
       });
 
-      expect(result).toHaveLength(2);
+      expect(result).toHaveLength(1);
     });
 
     it('gets second page of movies', async () => {
-      const result = await repository.getAll({
+      await prepareMovie(movie1);
+      await prepareMovie(movie2);
+
+      const result = await movieRepository.getAll({
         cancellationToken,
         page: 2,
-        pageSize: 2,
+        pageSize: 1,
       });
 
       expect(result).toHaveLength(1);
     });
 
     it('handles empty page', async () => {
-      const result = await repository.getAll({
+      await prepareMovie(movie1);
+
+      const result = await movieRepository.getAll({
         cancellationToken,
         page: 3,
-        pageSize: 2,
+        pageSize: 1,
       });
 
       expect(result).toHaveLength(0);
@@ -254,7 +296,10 @@ describe('movies repository', () => {
 
   describe('getAll - sorting', () => {
     it('sorts movies by title ascending', async () => {
-      const result = await repository.getAll({
+      await prepareMovie(movie2);
+      await prepareMovie(movie1);
+
+      const result = await movieRepository.getAll({
         cancellationToken,
         page: 1,
         pageSize: 3,
@@ -262,40 +307,46 @@ describe('movies repository', () => {
         sortField: 'title',
       });
 
-      expect(result[0]?.title).toBe('Movie 1');
-      expect(result[1]?.title).toBe('Movie 2');
-      expect(result[2]?.title).toBe('Movie 3');
+      expect(result[0]?.title).toBe(movie1.title);
+      expect(result[1]?.title).toBe(movie2.title);
     });
     it('sorts movies by title descending', async () => {
-      const result = await repository.getAll({
+      await prepareMovie(movie1);
+      await prepareMovie(movie2);
+
+      const result = await movieRepository.getAll({
         cancellationToken,
         page: 1,
-        pageSize: 3,
+        pageSize: 2,
         sortDirection: 'desc',
         sortField: 'title',
       });
 
-      expect(result[0]?.title).toBe('Movie 3');
-      expect(result[1]?.title).toBe('Movie 2');
-      expect(result[2]?.title).toBe('Movie 1');
+      expect(result[0]?.title).toBe(movie2.title);
+      expect(result[1]?.title).toBe(movie1.title);
     });
 
     it('sorts movies by year ascending', async () => {
-      const result = await repository.getAll({
+      await prepareMovie(movie2);
+      await prepareMovie(movie1);
+
+      const result = await movieRepository.getAll({
         cancellationToken,
         page: 1,
-        pageSize: 3,
+        pageSize: 2,
         sortDirection: 'asc',
         sortField: 'year',
       });
 
-      expect(result[0]?.yearOfRelease).toBe(2019);
-      expect(result[1]?.yearOfRelease).toBe(2020);
-      expect(result[2]?.yearOfRelease).toBe(2021);
+      expect(result[0]?.yearOfRelease).toBe(movie1.yearOfRelease);
+      expect(result[1]?.yearOfRelease).toBe(movie2.yearOfRelease);
     });
 
     it('sorts movies by year descending', async () => {
-      const result = await repository.getAll({
+      await prepareMovie(movie1);
+      await prepareMovie(movie2);
+
+      const result = await movieRepository.getAll({
         cancellationToken,
         page: 1,
         pageSize: 3,
@@ -303,49 +354,63 @@ describe('movies repository', () => {
         sortField: 'year',
       });
 
-      expect(result[0]?.yearOfRelease).toBe(2021);
-      expect(result[1]?.yearOfRelease).toBe(2020);
-      expect(result[2]?.yearOfRelease).toBe(2019);
+      expect(result[0]?.yearOfRelease).toBe(movie2.yearOfRelease);
+      expect(result[1]?.yearOfRelease).toBe(movie1.yearOfRelease);
     });
   });
 
   describe('getCount', () => {
     it('gets count of movies', async () => {
-      const result = await repository.getCount({ cancellationToken });
+      await prepareMovie(movie1);
+      await prepareMovie(movie2);
 
-      expect(result).toBe(3);
+      const result = await movieRepository.getCount({ cancellationToken });
+
+      expect(result).toBe(2);
     });
 
     it('gets count of movies by title', async () => {
-      const result = await repository.getCount({
+      await prepareMovie(movie1);
+      await prepareMovie(movie2);
+
+      const result = await movieRepository.getCount({
         cancellationToken,
-        title: 'Movie 1',
+        title: movie1.title,
       });
 
       expect(result).toBe(1);
     });
 
     it('gets count of movies by year of release', async () => {
-      const result = await repository.getCount({
+      await prepareMovie(movie1);
+      await prepareMovie(movie2);
+
+      const result = await movieRepository.getCount({
         cancellationToken,
-        yearOfRelease: 2020,
+        yearOfRelease: movie1.yearOfRelease,
       });
 
       expect(result).toBe(1);
     });
 
     it('gets count of movies by title and year of release', async () => {
-      const result = await repository.getCount({
+      await prepareMovie(movie1);
+      await prepareMovie(movie2);
+
+      const result = await movieRepository.getCount({
         cancellationToken,
-        title: 'Movie 1',
-        yearOfRelease: 2020,
+        title: movie1.title,
+        yearOfRelease: movie1.yearOfRelease,
       });
 
       expect(result).toBe(1);
     });
 
     it('returns 0 if no movies exist', async () => {
-      const result = await repository.getCount({
+      await prepareMovie(movie1);
+      await prepareMovie(movie2);
+
+      const result = await movieRepository.getCount({
         cancellationToken,
         title: 'Weird movie',
       });
