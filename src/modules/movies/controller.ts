@@ -98,8 +98,8 @@ export async function createMovieController(
       const movies = await movieService.getAll({
         page,
         pageSize: perPage,
+        sortDirection: order,
         sortField: sortBy,
-        sortOrder: order,
         title: title,
         userId,
         year: year,

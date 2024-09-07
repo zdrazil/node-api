@@ -18,7 +18,7 @@ export interface ICreateMovieQuery {
   result: ICreateMovieResult;
 }
 
-const createMovieIR: any = {"usedParamSet":{"id":true,"slug":true,"title":true,"year_of_release":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":66,"b":68}]},{"name":"slug","required":false,"transform":{"type":"scalar"},"locs":[{"a":70,"b":74}]},{"name":"title","required":false,"transform":{"type":"scalar"},"locs":[{"a":76,"b":81}]},{"name":"year_of_release","required":false,"transform":{"type":"scalar"},"locs":[{"a":83,"b":98}]}],"statement":"INSERT INTO\n  movies (id, slug, title, year_of_release)\nVALUES\n  (:id,:slug,:title,:year_of_release)"};
+const createMovieIR: any = {"usedParamSet":{"id":true,"slug":true,"title":true,"year_of_release":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":66,"b":68}]},{"name":"slug","required":false,"transform":{"type":"scalar"},"locs":[{"a":71,"b":75}]},{"name":"title","required":false,"transform":{"type":"scalar"},"locs":[{"a":78,"b":83}]},{"name":"year_of_release","required":false,"transform":{"type":"scalar"},"locs":[{"a":86,"b":101}]}],"statement":"INSERT INTO\n  movies (id, slug, title, year_of_release)\nVALUES\n  (:id, :slug, :title, :year_of_release)"};
 
 /**
  * Query generated from SQL:
@@ -26,7 +26,7 @@ const createMovieIR: any = {"usedParamSet":{"id":true,"slug":true,"title":true,"
  * INSERT INTO
  *   movies (id, slug, title, year_of_release)
  * VALUES
- *   (:id,:slug,:title,:year_of_release)
+ *   (:id, :slug, :title, :year_of_release)
  * ```
  */
 export const createMovie = new PreparedQuery<ICreateMovieParams,ICreateMovieResult>(createMovieIR);
@@ -47,7 +47,7 @@ export interface ICreateGenreQuery {
   result: ICreateGenreResult;
 }
 
-const createGenreIR: any = {"usedParamSet":{"movie_id":true,"name":true},"params":[{"name":"movie_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":48,"b":56}]},{"name":"name","required":false,"transform":{"type":"scalar"},"locs":[{"a":58,"b":62}]}],"statement":"INSERT INTO\n  genres (movie_id, name)\nVALUES\n  (:movie_id,:name)"};
+const createGenreIR: any = {"usedParamSet":{"movie_id":true,"name":true},"params":[{"name":"movie_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":48,"b":56}]},{"name":"name","required":false,"transform":{"type":"scalar"},"locs":[{"a":59,"b":63}]}],"statement":"INSERT INTO\n  genres (movie_id, name)\nVALUES\n  (:movie_id, :name)"};
 
 /**
  * Query generated from SQL:
@@ -55,7 +55,7 @@ const createGenreIR: any = {"usedParamSet":{"movie_id":true,"name":true},"params
  * INSERT INTO
  *   genres (movie_id, name)
  * VALUES
- *   (:movie_id,:name)
+ *   (:movie_id, :name)
  * ```
  */
 export const createGenre = new PreparedQuery<ICreateGenreParams,ICreateGenreResult>(createGenreIR);
@@ -83,7 +83,7 @@ export interface IGetMovieByIdQuery {
   result: IGetMovieByIdResult;
 }
 
-const getMovieByIdIR: any = {"usedParamSet":{"user_id":true,"id":true},"params":[{"name":"user_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":204,"b":211}]},{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":225,"b":227}]}],"statement":"SELECT\n  m.*,\n  round(avg(r.rating), 1) AS rating,\n  myr.rating AS user_rating\nFROM\n  movies m\n  LEFT JOIN ratings r ON m.id = r.movie_id\n  LEFT JOIN ratings myr ON m.id = myr.movie_id\n  AND myr.user_id =:user_id\nWHERE\n  id =:id\nGROUP BY\n  id,\n  user_rating"};
+const getMovieByIdIR: any = {"usedParamSet":{"user_id":true,"id":true},"params":[{"name":"user_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":205,"b":212}]},{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":227,"b":229}]}],"statement":"SELECT\n  m.*,\n  round(avg(r.rating), 1) AS rating,\n  myr.rating AS user_rating\nFROM\n  movies m\n  LEFT JOIN ratings r ON m.id = r.movie_id\n  LEFT JOIN ratings myr ON m.id = myr.movie_id\n  AND myr.user_id = :user_id\nWHERE\n  id = :id\nGROUP BY\n  id,\n  user_rating"};
 
 /**
  * Query generated from SQL:
@@ -96,9 +96,9 @@ const getMovieByIdIR: any = {"usedParamSet":{"user_id":true,"id":true},"params":
  *   movies m
  *   LEFT JOIN ratings r ON m.id = r.movie_id
  *   LEFT JOIN ratings myr ON m.id = myr.movie_id
- *   AND myr.user_id =:user_id
+ *   AND myr.user_id = :user_id
  * WHERE
- *   id =:id
+ *   id = :id
  * GROUP BY
  *   id,
  *   user_rating
@@ -123,7 +123,7 @@ export interface IGetMovieGenresQuery {
   result: IGetMovieGenresResult;
 }
 
-const getMovieGenresIR: any = {"usedParamSet":{"movie_id":true},"params":[{"name":"movie_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":46,"b":54}]}],"statement":"SELECT\n  name\nFROM\n  genres\nWHERE\n  movie_id =:movie_id"};
+const getMovieGenresIR: any = {"usedParamSet":{"movie_id":true},"params":[{"name":"movie_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":47,"b":55}]}],"statement":"SELECT\n  name\nFROM\n  genres\nWHERE\n  movie_id = :movie_id"};
 
 /**
  * Query generated from SQL:
@@ -133,7 +133,7 @@ const getMovieGenresIR: any = {"usedParamSet":{"movie_id":true},"params":[{"name
  * FROM
  *   genres
  * WHERE
- *   movie_id =:movie_id
+ *   movie_id = :movie_id
  * ```
  */
 export const getMovieGenres = new PreparedQuery<IGetMovieGenresParams,IGetMovieGenresResult>(getMovieGenresIR);
@@ -161,7 +161,7 @@ export interface IGetMovieBySlugQuery {
   result: IGetMovieBySlugResult;
 }
 
-const getMovieBySlugIR: any = {"usedParamSet":{"user_id":true,"slug":true},"params":[{"name":"user_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":204,"b":211}]},{"name":"slug","required":false,"transform":{"type":"scalar"},"locs":[{"a":227,"b":231}]}],"statement":"SELECT\n  m.*,\n  round(avg(r.rating), 1) AS rating,\n  myr.rating AS user_rating\nFROM\n  movies m\n  LEFT JOIN ratings r ON m.id = r.movie_id\n  LEFT JOIN ratings myr ON m.id = myr.movie_id\n  AND myr.user_id =:user_id\nWHERE\n  slug =:slug\nGROUP BY\n  id,\n  user_rating"};
+const getMovieBySlugIR: any = {"usedParamSet":{"user_id":true,"slug":true},"params":[{"name":"user_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":205,"b":212}]},{"name":"slug","required":false,"transform":{"type":"scalar"},"locs":[{"a":229,"b":233}]}],"statement":"SELECT\n  m.*,\n  round(avg(r.rating), 1) AS rating,\n  myr.rating AS user_rating\nFROM\n  movies m\n  LEFT JOIN ratings r ON m.id = r.movie_id\n  LEFT JOIN ratings myr ON m.id = myr.movie_id\n  AND myr.user_id = :user_id\nWHERE\n  slug = :slug\nGROUP BY\n  id,\n  user_rating"};
 
 /**
  * Query generated from SQL:
@@ -174,9 +174,9 @@ const getMovieBySlugIR: any = {"usedParamSet":{"user_id":true,"slug":true},"para
  *   movies m
  *   LEFT JOIN ratings r ON m.id = r.movie_id
  *   LEFT JOIN ratings myr ON m.id = myr.movie_id
- *   AND myr.user_id =:user_id
+ *   AND myr.user_id = :user_id
  * WHERE
- *   slug =:slug
+ *   slug = :slug
  * GROUP BY
  *   id,
  *   user_rating
@@ -199,14 +199,15 @@ export interface IDeleteGenresQuery {
   result: IDeleteGenresResult;
 }
 
-const deleteGenresIR: any = {"usedParamSet":{"movie_id":true},"params":[{"name":"movie_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":37,"b":45}]}],"statement":"DELETE FROM genres\nWHERE\n  movie_id =:movie_id"};
+const deleteGenresIR: any = {"usedParamSet":{"movie_id":true},"params":[{"name":"movie_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":40,"b":48}]}],"statement":"DELETE FROM\n  genres\nWHERE\n  movie_id = :movie_id"};
 
 /**
  * Query generated from SQL:
  * ```
- * DELETE FROM genres
+ * DELETE FROM
+ *   genres
  * WHERE
- *   movie_id =:movie_id
+ *   movie_id = :movie_id
  * ```
  */
 export const deleteGenres = new PreparedQuery<IDeleteGenresParams,IDeleteGenresResult>(deleteGenresIR);
@@ -229,18 +230,19 @@ export interface IUpdateMovieQuery {
   result: IUpdateMovieResult;
 }
 
-const updateMovieIR: any = {"usedParamSet":{"slug":true,"title":true,"year_of_release":true,"id":true},"params":[{"name":"slug","required":false,"transform":{"type":"scalar"},"locs":[{"a":26,"b":30}]},{"name":"title","required":false,"transform":{"type":"scalar"},"locs":[{"a":42,"b":47}]},{"name":"year_of_release","required":false,"transform":{"type":"scalar"},"locs":[{"a":69,"b":84}]},{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":98,"b":100}]}],"statement":"UPDATE movies\nSET\n  slug =:slug,\n  title =:title,\n  year_of_release =:year_of_release\nWHERE\n  id =:id"};
+const updateMovieIR: any = {"usedParamSet":{"slug":true,"title":true,"year_of_release":true,"id":true},"params":[{"name":"slug","required":false,"transform":{"type":"scalar"},"locs":[{"a":29,"b":33}]},{"name":"title","required":false,"transform":{"type":"scalar"},"locs":[{"a":46,"b":51}]},{"name":"year_of_release","required":false,"transform":{"type":"scalar"},"locs":[{"a":74,"b":89}]},{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":104,"b":106}]}],"statement":"UPDATE\n  movies\nSET\n  slug = :slug,\n  title = :title,\n  year_of_release = :year_of_release\nWHERE\n  id = :id"};
 
 /**
  * Query generated from SQL:
  * ```
- * UPDATE movies
+ * UPDATE
+ *   movies
  * SET
- *   slug =:slug,
- *   title =:title,
- *   year_of_release =:year_of_release
+ *   slug = :slug,
+ *   title = :title,
+ *   year_of_release = :year_of_release
  * WHERE
- *   id =:id
+ *   id = :id
  * ```
  */
 export const updateMovie = new PreparedQuery<IUpdateMovieParams,IUpdateMovieResult>(updateMovieIR);
@@ -260,14 +262,15 @@ export interface IDeleteRatingsQuery {
   result: IDeleteRatingsResult;
 }
 
-const deleteRatingsIR: any = {"usedParamSet":{"movie_id":true},"params":[{"name":"movie_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":38,"b":46}]}],"statement":"DELETE FROM ratings\nWHERE\n  movie_id =:movie_id"};
+const deleteRatingsIR: any = {"usedParamSet":{"movie_id":true},"params":[{"name":"movie_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":41,"b":49}]}],"statement":"DELETE FROM\n  ratings\nWHERE\n  movie_id = :movie_id"};
 
 /**
  * Query generated from SQL:
  * ```
- * DELETE FROM ratings
+ * DELETE FROM
+ *   ratings
  * WHERE
- *   movie_id =:movie_id
+ *   movie_id = :movie_id
  * ```
  */
 export const deleteRatings = new PreparedQuery<IDeleteRatingsParams,IDeleteRatingsResult>(deleteRatingsIR);
@@ -287,14 +290,15 @@ export interface IDeleteMovieQuery {
   result: IDeleteMovieResult;
 }
 
-const deleteMovieIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":31,"b":33}]}],"statement":"DELETE FROM movies\nWHERE\n  id =:id"};
+const deleteMovieIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":34,"b":36}]}],"statement":"DELETE FROM\n  movies\nWHERE\n  id = :id"};
 
 /**
  * Query generated from SQL:
  * ```
- * DELETE FROM movies
+ * DELETE FROM
+ *   movies
  * WHERE
- *   id =:id
+ *   id = :id
  * ```
  */
 export const deleteMovie = new PreparedQuery<IDeleteMovieParams,IDeleteMovieResult>(deleteMovieIR);
@@ -316,7 +320,7 @@ export interface IMovieExistsQuery {
   result: IMovieExistsResult;
 }
 
-const movieExistsIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":44,"b":46}]}],"statement":"SELECT\n  count(1)\nFROM\n  movies\nWHERE\n  id =:id"};
+const movieExistsIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","required":false,"transform":{"type":"scalar"},"locs":[{"a":45,"b":47}]}],"statement":"SELECT\n  count(1)\nFROM\n  movies\nWHERE\n  id = :id"};
 
 /**
  * Query generated from SQL:
@@ -326,7 +330,7 @@ const movieExistsIR: any = {"usedParamSet":{"id":true},"params":[{"name":"id","r
  * FROM
  *   movies
  * WHERE
- *   id =:id
+ *   id = :id
  * ```
  */
 export const movieExists = new PreparedQuery<IMovieExistsParams,IMovieExistsResult>(movieExistsIR);
@@ -349,7 +353,7 @@ export interface IGetMovieCountQuery {
   result: IGetMovieCountResult;
 }
 
-const getMovieCountIR: any = {"usedParamSet":{"title":true,"year_of_release":true},"params":[{"name":"title","required":false,"transform":{"type":"scalar"},"locs":[{"a":43,"b":48},{"a":89,"b":94}]},{"name":"year_of_release","required":false,"transform":{"type":"scalar"},"locs":[{"a":116,"b":131},{"a":174,"b":189}]}],"statement":"SELECT\n  count(id)\nFROM\n  movies\nWHERE\n  (\n:title::TEXT IS NULL\n    OR title LIKE ('%' ||:title || '%')\n  )\n  AND (\n:year_of_release::INTEGER IS NULL\n    OR year_of_release =:year_of_release\n  )"};
+const getMovieCountIR: any = {"usedParamSet":{"title":true,"year_of_release":true},"params":[{"name":"title","required":false,"transform":{"type":"scalar"},"locs":[{"a":47,"b":52},{"a":96,"b":101}]},{"name":"year_of_release","required":false,"transform":{"type":"scalar"},"locs":[{"a":127,"b":142},{"a":188,"b":203}]}],"statement":"SELECT\n  count(id)\nFROM\n  movies\nWHERE\n  (\n    :title :: TEXT IS NULL\n    OR title LIKE ('%' || :title || '%')\n  )\n  AND (\n    :year_of_release :: INTEGER IS NULL\n    OR year_of_release = :year_of_release\n  )"};
 
 /**
  * Query generated from SQL:
@@ -360,12 +364,12 @@ const getMovieCountIR: any = {"usedParamSet":{"title":true,"year_of_release":tru
  *   movies
  * WHERE
  *   (
- * :title::TEXT IS NULL
- *     OR title LIKE ('%' ||:title || '%')
+ *     :title :: TEXT IS NULL
+ *     OR title LIKE ('%' || :title || '%')
  *   )
  *   AND (
- * :year_of_release::INTEGER IS NULL
- *     OR year_of_release =:year_of_release
+ *     :year_of_release :: INTEGER IS NULL
+ *     OR year_of_release = :year_of_release
  *   )
  * ```
  */
@@ -374,9 +378,10 @@ export const getMovieCount = new PreparedQuery<IGetMovieCountParams,IGetMovieCou
 
 /** 'GetAllMovies' parameters type */
 export interface IGetAllMoviesParams {
-  order_column?: string | null | void;
-  pageOffset?: number | null | void;
-  pageSize?: number | null | void;
+  page_offset?: number | null | void;
+  page_size?: number | null | void;
+  sort_column?: string | null | void;
+  sort_direction?: string | null | void;
   title?: string | null | void;
   user_id?: string | null | void;
   year_of_release?: number | null | void;
@@ -399,7 +404,7 @@ export interface IGetAllMoviesQuery {
   result: IGetAllMoviesResult;
 }
 
-const getAllMoviesIR: any = {"usedParamSet":{"user_id":true,"title":true,"year_of_release":true,"order_column":true,"pageSize":true,"pageOffset":true},"params":[{"name":"user_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":292,"b":299}]},{"name":"title","required":false,"transform":{"type":"scalar"},"locs":[{"a":311,"b":316},{"a":359,"b":364}]},{"name":"year_of_release","required":false,"transform":{"type":"scalar"},"locs":[{"a":386,"b":401},{"a":442,"b":457}]},{"name":"order_column","required":false,"transform":{"type":"scalar"},"locs":[{"a":493,"b":505},{"a":516,"b":528}]},{"name":"pageSize","required":false,"transform":{"type":"scalar"},"locs":[{"a":536,"b":544}]},{"name":"pageOffset","required":false,"transform":{"type":"scalar"},"locs":[{"a":558,"b":568}]}],"statement":"SELECT\n  m.*,\n  string_agg(DISTINCT g.name, ',') AS genres,\n  round(avg(r.rating), 1) AS rating,\n  myr.rating AS user_rating\nFROM\n  movies m\n  LEFT JOIN genres g ON m.id = g.movie_id\n  LEFT JOIN ratings r ON m.id = r.movie_id\n  LEFT JOIN ratings myr ON m.id = myr.movie_id\n  AND myr.user_id =:user_id\nWHERE\n  (\n:title::TEXT IS NULL\n    OR m.title LIKE ('%' ||:title || '%')\n  )\n  AND (\n:year_of_release::INT IS NULL\n    OR m.year_of_release =:year_of_release\n  )\nGROUP BY\n  id,\n  user_rating,\n:order_column\nORDER BY\n:order_column\nLIMIT\n:pageSize::INT\nOFFSET\n:pageOffset::INT"};
+const getAllMoviesIR: any = {"usedParamSet":{"user_id":true,"title":true,"year_of_release":true,"sort_column":true,"sort_direction":true,"page_size":true,"page_offset":true},"params":[{"name":"user_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":293,"b":300}]},{"name":"title","required":false,"transform":{"type":"scalar"},"locs":[{"a":316,"b":321},{"a":367,"b":372}]},{"name":"year_of_release","required":false,"transform":{"type":"scalar"},"locs":[{"a":398,"b":413},{"a":457,"b":472}]},{"name":"sort_column","required":false,"transform":{"type":"scalar"},"locs":[{"a":572,"b":583},{"a":683,"b":694},{"a":796,"b":807},{"a":916,"b":927}]},{"name":"sort_direction","required":false,"transform":{"type":"scalar"},"locs":[{"a":605,"b":619},{"a":716,"b":730},{"a":828,"b":842},{"a":948,"b":962}]},{"name":"page_size","required":false,"transform":{"type":"scalar"},"locs":[{"a":1021,"b":1030}]},{"name":"page_offset","required":false,"transform":{"type":"scalar"},"locs":[{"a":1046,"b":1057}]}],"statement":"SELECT\n  m.*,\n  string_agg(DISTINCT g.name, ',') AS genres,\n  round(avg(r.rating), 1) AS rating,\n  myr.rating AS user_rating\nFROM\n  movies m\n  LEFT JOIN genres g ON m.id = g.movie_id\n  LEFT JOIN ratings r ON m.id = r.movie_id\n  LEFT JOIN ratings myr ON m.id = myr.movie_id\n  AND myr.user_id = :user_id\nWHERE\n  (\n    :title :: TEXT IS NULL\n    OR m.title LIKE ('%' || :title || '%')\n  )\n  AND (\n    :year_of_release :: INT IS NULL\n    OR m.year_of_release = :year_of_release\n  )\nGROUP BY\n  id,\n  user_rating,\n  m.title,\n  m.year_of_release\norder by\n  (\n    case\n      when :sort_column = 'title'\n      and :sort_direction = 'asc' then m.title\n    end\n  ) asc,\n  (\n    case\n      when :sort_column = 'title'\n      and :sort_direction = 'desc' then m.title\n    end\n  ) desc,\n  (\n    case\n      when :sort_column = 'year'\n      and :sort_direction = 'asc' then m.year_of_release\n    end\n  ) asc,\n  (\n    case\n      when :sort_column = 'year'\n      and :sort_direction = 'desc' then m.year_of_release\n    end\n  ) desc\nLIMIT\n  :page_size :: INT OFFSET :page_offset :: INT"};
 
 /**
  * Query generated from SQL:
@@ -414,26 +419,48 @@ const getAllMoviesIR: any = {"usedParamSet":{"user_id":true,"title":true,"year_o
  *   LEFT JOIN genres g ON m.id = g.movie_id
  *   LEFT JOIN ratings r ON m.id = r.movie_id
  *   LEFT JOIN ratings myr ON m.id = myr.movie_id
- *   AND myr.user_id =:user_id
+ *   AND myr.user_id = :user_id
  * WHERE
  *   (
- * :title::TEXT IS NULL
- *     OR m.title LIKE ('%' ||:title || '%')
+ *     :title :: TEXT IS NULL
+ *     OR m.title LIKE ('%' || :title || '%')
  *   )
  *   AND (
- * :year_of_release::INT IS NULL
- *     OR m.year_of_release =:year_of_release
+ *     :year_of_release :: INT IS NULL
+ *     OR m.year_of_release = :year_of_release
  *   )
  * GROUP BY
  *   id,
  *   user_rating,
- * :order_column
- * ORDER BY
- * :order_column
+ *   m.title,
+ *   m.year_of_release
+ * order by
+ *   (
+ *     case
+ *       when :sort_column = 'title'
+ *       and :sort_direction = 'asc' then m.title
+ *     end
+ *   ) asc,
+ *   (
+ *     case
+ *       when :sort_column = 'title'
+ *       and :sort_direction = 'desc' then m.title
+ *     end
+ *   ) desc,
+ *   (
+ *     case
+ *       when :sort_column = 'year'
+ *       and :sort_direction = 'asc' then m.year_of_release
+ *     end
+ *   ) asc,
+ *   (
+ *     case
+ *       when :sort_column = 'year'
+ *       and :sort_direction = 'desc' then m.year_of_release
+ *     end
+ *   ) desc
  * LIMIT
- * :pageSize::INT
- * OFFSET
- * :pageOffset::INT
+ *   :page_size :: INT OFFSET :page_offset :: INT
  * ```
  */
 export const getAllMovies = new PreparedQuery<IGetAllMoviesParams,IGetAllMoviesResult>(getAllMoviesIR);

@@ -1,6 +1,6 @@
 import { Static, Type } from '@sinclair/typebox';
 import { pagedRequestDescription } from '../../paging';
-import { sortOrderSchema } from '../../sortOrder';
+import { sortDirectionSchema } from '../../sortDirection';
 import { movieResponseDtoSchema } from '../response';
 
 const sortFieldSchema = Type.Union([
@@ -12,7 +12,7 @@ export type SortField = Static<typeof sortFieldSchema>;
 
 export const getAllMoviesRequestDtoSchema = Type.Object({
   ...pagedRequestDescription,
-  order: Type.Optional(sortOrderSchema),
+  order: Type.Optional(sortDirectionSchema),
   sortBy: Type.Optional(sortFieldSchema),
   title: Type.Optional(
     Type.String({

@@ -18,11 +18,11 @@ const config = {
   plugins: [
     '@ianvs/prettier-plugin-sort-imports',
     'prettier-plugin-jsdoc',
-    'prettier-plugin-sql',
+    // 'prettier-plugin-sql',
     'prettier-plugin-embed',
     'prettier-plugin-packagejson',
   ],
-  ...sqlSettings,
+  // ...sqlSettings,
   proseWrap: 'never',
   singleQuote: true,
   trailingComma: 'all',

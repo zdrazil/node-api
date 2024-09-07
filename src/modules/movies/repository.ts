@@ -1,6 +1,6 @@
 import { MovieDb, Movie } from './models';
 import { sql } from '../../tooling/sql';
-import { SortOrder } from '../sortOrder';
+import { SortDirection } from '../sortDirection';
 import { SortField } from './getAllMovies/schema';
 import { Client } from 'pg';
 import { objectToCamel } from 'ts-case-convert';
@@ -211,16 +211,16 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
   async function getAll({
     page = 1,
     pageSize = 1,
+    sortDirection: sortDirection,
     sortField,
-    sortOrder,
     title,
     userId,
     year,
   }: {
     page?: number;
     pageSize?: number;
+    sortDirection?: SortDirection;
     sortField?: SortField;
-    sortOrder?: SortOrder;
     title?: string;
     userId?: string;
     year?: number;
@@ -228,23 +228,16 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     const client = await db();
     await client.connect();
 
-    const orderClause =
-      sortField != null
-        ? sql`
-            ,
-            m.${sortField}
-            ORDER BY
-              m.${sortField} ${sortOrder === 'asc' ? 'asc' : 'desc'}
-          `
-        : '';
-
     const pageOffset = (page - 1) * pageSize;
+
+    console.log(sortField);
 
     const result = await getAllMovies.run(
       {
-        order_column: sortField,
-        pageOffset,
-        pageSize,
+        page_offset: pageOffset,
+        page_size: pageSize,
+        sort_column: sortField,
+        sort_direction: sortDirection,
         title,
         user_id: userId,
         year_of_release: year,

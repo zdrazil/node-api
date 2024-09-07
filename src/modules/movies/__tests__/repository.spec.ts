@@ -218,8 +218,8 @@ describe('movies repository', () => {
       const result = await repository.getAll({
         page: 1,
         pageSize: 3,
+        sortDirection: 'asc',
         sortField: 'title',
-        sortOrder: 'asc',
       });
 
       console.log(result);
@@ -227,6 +227,46 @@ describe('movies repository', () => {
       expect(result[0]?.title).toBe('Movie 1');
       expect(result[1]?.title).toBe('Movie 2');
       expect(result[2]?.title).toBe('Movie 3');
+    });
+    it('sorts movies by title descending', async () => {
+      const result = await repository.getAll({
+        page: 1,
+        pageSize: 3,
+        sortDirection: 'desc',
+        sortField: 'title',
+      });
+
+      expect(result[0]?.title).toBe('Movie 3');
+      expect(result[1]?.title).toBe('Movie 2');
+      expect(result[2]?.title).toBe('Movie 1');
+    });
+
+    it('sorts movies by year ascending', async () => {
+      const result = await repository.getAll({
+        page: 1,
+        pageSize: 3,
+        sortDirection: 'asc',
+        sortField: 'year',
+      });
+
+      console.log(result);
+
+      expect(result[0]?.yearOfRelease).toBe(2019);
+      expect(result[1]?.yearOfRelease).toBe(2020);
+      expect(result[2]?.yearOfRelease).toBe(2021);
+    });
+
+    it('sorts movies by year descending', async () => {
+      const result = await repository.getAll({
+        page: 1,
+        pageSize: 3,
+        sortDirection: 'desc',
+        sortField: 'year',
+      });
+
+      expect(result[0]?.yearOfRelease).toBe(2021);
+      expect(result[1]?.yearOfRelease).toBe(2020);
+      expect(result[2]?.yearOfRelease).toBe(2019);
     });
   });
 
