@@ -2,6 +2,8 @@ import { createDb, startDbEnvironment } from '../../../testing/db';
 import { StartedDockerComposeEnvironment } from 'testcontainers';
 import { createRatingRepository, RatingRepository } from '../repository';
 
+const cancellationToken = false;
+
 describe('ratings repository', () => {
   const userId = '2ee75e90-f4c6-4de2-8580-300f76fff238';
 
@@ -21,13 +23,17 @@ describe('ratings repository', () => {
     it('gets a rating by movie id', async () => {
       const movieId = '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3';
 
-      const result = await repository.getRatingByMovieId({ movieId });
+      const result = await repository.getRatingByMovieId({
+        cancellationToken,
+        movieId,
+      });
 
       expect(result).toEqual(4.5);
     });
 
     it('returns 0 if movie does not exist', async () => {
       const result = await repository.getRatingByMovieId({
+        cancellationToken,
         movieId: '00000000-6a9b-4bbb-a339-e05aa0be5af3',
       });
 
@@ -40,6 +46,7 @@ describe('ratings repository', () => {
       const movieId = '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3';
 
       const result = await repository.getRatingByMovieAndUserId({
+        cancellationToken,
         movieId,
         userId,
       });
@@ -54,12 +61,14 @@ describe('ratings repository', () => {
       const rating = 5;
 
       const ratingResult = await repository.rateMovie({
+        cancellationToken,
         movieId,
         rating,
         userId,
       });
 
       const movieResult = await repository.getRatingByMovieAndUserId({
+        cancellationToken,
         movieId,
         userId,
       });
@@ -73,9 +82,10 @@ describe('ratings repository', () => {
     it('deletes a rating', async () => {
       const movieId = '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3';
 
-      await repository.deleteRating({ movieId, userId });
+      await repository.deleteRating({ cancellationToken, movieId, userId });
 
       const movieResult = await repository.getRatingByMovieAndUserId({
+        cancellationToken,
         movieId,
         userId,
       });
@@ -87,11 +97,13 @@ describe('ratings repository', () => {
       const movieId = '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3';
 
       await repository.deleteRating({
+        cancellationToken,
         movieId,
         userId: '2ee75e90-0000-4de2-8580-300f76fff238',
       });
 
       const movieResult = await repository.getRatingByMovieAndUserId({
+        cancellationToken,
         movieId,
         userId,
       });
@@ -102,7 +114,10 @@ describe('ratings repository', () => {
 
   describe('getRatingsForUser', () => {
     it('gets ratings for user', async () => {
-      const result = await repository.getRatingsForUser({ userId });
+      const result = await repository.getRatingsForUser({
+        cancellationToken,
+        userId,
+      });
 
       expect(result.length).toEqual(2);
 
@@ -118,6 +133,7 @@ describe('ratings repository', () => {
 
     it('returns empty array if user has no ratings', async () => {
       const result = await repository.getRatingsForUser({
+        cancellationToken,
         userId: '2ee75e90-0000-4de2-8580-300f76fff238',
       });
 

@@ -30,7 +30,7 @@ async function createRoutes({ fastify }: { fastify: FastifyInstance }) {
     ratingRepository,
   });
 
-  await createRatingController(fastify, { movieService, ratingService });
+  await createRatingController(fastify, { ratingService });
   await createMovieController(fastify, { movieService });
   await createIdentityController(fastify);
 }

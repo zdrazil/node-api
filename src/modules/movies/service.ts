@@ -11,9 +11,14 @@ export const createMovieService = ({
   movieRepository: MovieRepository;
   ratingRepository: RatingRepository;
 }) => {
-  async function create(movie: Movie): Promise<boolean> {
-    // await movieValidator.ValidateAndThrowAsync(movie, cancellationToken);
-    return movieRepository.create(movie);
+  async function create({
+    cancellationToken,
+    movie,
+  }: {
+    cancellationToken: boolean;
+    movie: Movie;
+  }): Promise<boolean> {
+    return movieRepository.create({ cancellationToken, movie });
   }
 
   const getById = movieRepository.getById;
@@ -22,18 +27,25 @@ export const createMovieService = ({
 
   async function update(
     movie: Movie,
-    { userId }: { userId?: string },
+    {
+      cancellationToken,
+      userId,
+    }: { cancellationToken: boolean; userId?: string },
   ): Promise<Movie | null> {
-    const movieExists = await movieRepository.existsById({ id: movie.id });
+    const movieExists = await movieRepository.existsById({
+      cancellationToken,
+      id: movie.id,
+    });
 
     if (!movieExists) {
       return null;
     }
 
-    await movieRepository.update({ movie });
+    await movieRepository.update({ cancellationToken, movie });
 
     if (userId == null) {
       const rating = await ratingRepository.getRatingByMovieId({
+        cancellationToken,
         movieId: movie.id,
       });
 
@@ -44,6 +56,7 @@ export const createMovieService = ({
     }
 
     const userRating = await ratingRepository.getRatingByMovieAndUserId({
+      cancellationToken,
       movieId: movie.id,
       userId,
     });

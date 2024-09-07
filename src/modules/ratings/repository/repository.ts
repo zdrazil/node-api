@@ -12,6 +12,7 @@ export function createRatingRepository({ db }: { db: () => Promise<Client> }) {
   async function getRatingByMovieId({
     movieId,
   }: {
+    cancellationToken: boolean;
     movieId: string;
   }): Promise<number> {
     const client = await db();
@@ -28,6 +29,7 @@ export function createRatingRepository({ db }: { db: () => Promise<Client> }) {
     movieId,
     userId,
   }: {
+    cancellationToken: boolean;
     movieId: string;
     userId: string;
   }): Promise<number> {
@@ -49,6 +51,7 @@ export function createRatingRepository({ db }: { db: () => Promise<Client> }) {
     rating,
     userId,
   }: {
+    cancellationToken: boolean;
     movieId: string;
     rating: number;
     userId: string;
@@ -70,6 +73,7 @@ export function createRatingRepository({ db }: { db: () => Promise<Client> }) {
     movieId,
     userId,
   }: {
+    cancellationToken: boolean;
     movieId: string;
     userId: string;
   }): Promise<boolean> {
@@ -89,6 +93,7 @@ export function createRatingRepository({ db }: { db: () => Promise<Client> }) {
   async function getRatingsForUser({
     userId,
   }: {
+    cancellationToken: boolean;
     userId: string;
   }): Promise<MovieRating[]> {
     const client = await db();

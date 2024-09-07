@@ -31,9 +31,10 @@ export async function createMovieController(
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
       const movie = createMovieRequestToMovie(req.body);
+      const cancellationToken = req.raw.aborted;
 
       try {
-        await movieService.create(movie);
+        await movieService.create({ cancellationToken, movie });
       } catch (error) {
         if (error instanceof ConflictException) {
           throw new MovieAlreadyExistsError(error);
@@ -63,10 +64,11 @@ export async function createMovieController(
     handler: async (req, res) => {
       const { id } = req.params;
       const userId = req.user.userId;
+      const cancellationToken = req.raw.aborted;
 
       const movie = isUuid(id)
-        ? await movieService.getById({ id, userId })
-        : await movieService.getBySlug({ slug: id, userId });
+        ? await movieService.getById({ cancellationToken, id, userId })
+        : await movieService.getBySlug({ cancellationToken, slug: id, userId });
 
       if (!movie) {
         return res.status(404).send();
@@ -92,8 +94,10 @@ export async function createMovieController(
     handler: async (req, res) => {
       const { order, page, perPage, sortBy, title, year } = req.params;
       const userId = req.user.userId;
+      const cancellationToken = req.raw.aborted;
 
       const movies = await movieService.getAll({
+        cancellationToken,
         page,
         pageSize: perPage,
         sortDirection: order,
@@ -104,6 +108,7 @@ export async function createMovieController(
       });
 
       const movieCount = await movieService.getCount({
+        cancellationToken,
         title,
         yearOfRelease: year,
       });
@@ -132,10 +137,14 @@ export async function createMovieController(
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
       const userId = req.user.userId;
+      const cancellationToken = req.raw.aborted;
 
       const movie = updateMovieRequestToMovie(req.body, req.params.id);
 
-      const updatedMovie = await movieService.update(movie, { userId });
+      const updatedMovie = await movieService.update(movie, {
+        cancellationToken,
+        userId,
+      });
 
       if (!updatedMovie) {
         return res.status(404).send();
@@ -162,7 +171,12 @@ export async function createMovieController(
 
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
-      const deleted = await movieService.deleteById({ id: req.params.id });
+      const cancellationToken = req.raw.aborted;
+
+      const deleted = await movieService.deleteById({
+        cancellationToken,
+        id: req.params.id,
+      });
 
       if (!deleted) {
         return res.status(404).send();

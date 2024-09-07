@@ -4,6 +4,8 @@ import { Movie } from '../../models';
 import { createMovieRepository, MovieRepository } from '../repository';
 import { randomUUID } from 'crypto';
 
+const cancellationToken = false;
+
 describe('movies repository', () => {
   const userId = '2ee75e90-f4c6-4de2-8580-300f76fff238';
 
@@ -33,7 +35,11 @@ describe('movies repository', () => {
     it('gets a movie by id', async () => {
       const id = '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3';
 
-      const result = await repository.getById({ id, userId });
+      const result = await repository.getById({
+        cancellationToken,
+        id,
+        userId,
+      });
 
       const expected: Movie = {
         genres: ['Action', 'Thriller'],
@@ -51,7 +57,11 @@ describe('movies repository', () => {
       const id = randomUUID();
       const userId = randomUUID();
 
-      const result = await repository.getById({ id, userId });
+      const result = await repository.getById({
+        cancellationToken,
+        id,
+        userId,
+      });
 
       expect(result).toBeUndefined();
     });
@@ -67,8 +77,9 @@ describe('movies repository', () => {
         yearOfRelease: 2021,
       };
 
-      await repository.create(movie);
+      await repository.create({ cancellationToken, movie });
       const result = await repository.getById({
+        cancellationToken,
         id: movie.id,
         userId: randomUUID(),
       });
@@ -85,7 +96,11 @@ describe('movies repository', () => {
     it('gets a movie by slug', async () => {
       const slug = 'movie-1';
 
-      const result = await repository.getBySlug({ slug, userId });
+      const result = await repository.getBySlug({
+        cancellationToken,
+        slug,
+        userId,
+      });
 
       const expected: Movie = {
         genres: ['Action', 'Thriller'],
@@ -110,10 +125,15 @@ describe('movies repository', () => {
         yearOfRelease: 2021,
       };
       await repository.update({
+        cancellationToken,
         movie: updatedMovie,
       });
 
-      const result = await repository.getById({ id: movie.id, userId });
+      const result = await repository.getById({
+        cancellationToken,
+        id: movie.id,
+        userId,
+      });
 
       expect(result).toEqual({ ...movie, ...updatedMovie });
     });
@@ -131,9 +151,13 @@ describe('movies repository', () => {
     it('deletes a movie', async () => {
       const id = movie.id;
 
-      await repository.deleteById({ id });
+      await repository.deleteById({ cancellationToken, id });
 
-      const result = await repository.getById({ id, userId });
+      const result = await repository.getById({
+        cancellationToken,
+        id,
+        userId,
+      });
 
       expect(result).toBeUndefined();
     });
@@ -143,7 +167,7 @@ describe('movies repository', () => {
     it('returns true if movie exists', async () => {
       const id = '8f2cdb0e-6a9b-4bbb-a339-e05aa0be5af3';
 
-      const result = await repository.existsById({ id });
+      const result = await repository.existsById({ cancellationToken, id });
 
       expect(result).toBe(true);
     });
@@ -151,7 +175,7 @@ describe('movies repository', () => {
     it('returns false if movie does not exist', async () => {
       const id = randomUUID();
 
-      const result = await repository.existsById({ id });
+      const result = await repository.existsById({ cancellationToken, id });
 
       expect(result).toBe(false);
     });
@@ -159,7 +183,7 @@ describe('movies repository', () => {
 
   describe('getAll', () => {
     it('gets movies', async () => {
-      const result = await repository.getAll({});
+      const result = await repository.getAll({ cancellationToken });
 
       expect(result[0]).toEqual({
         genres: ['Action', 'Thriller'],
@@ -173,20 +197,23 @@ describe('movies repository', () => {
     });
 
     it('gets user rating', async () => {
-      const result = await repository.getAll({ userId });
+      const result = await repository.getAll({ cancellationToken, userId });
 
       expect(result[0]?.userRating).toEqual(4);
     });
 
     it('filters movies by title', async () => {
-      const result = await repository.getAll({ title: 'Movie 1' });
+      const result = await repository.getAll({
+        cancellationToken,
+        title: 'Movie 1',
+      });
 
       expect(result).toHaveLength(1);
       expect(result[0]?.title).toContain('Movie 1');
     });
 
     it('filters movies by year of release', async () => {
-      const result = await repository.getAll({ year: 2020 });
+      const result = await repository.getAll({ cancellationToken, year: 2020 });
 
       expect(result).toHaveLength(1);
       expect(result[0]?.yearOfRelease).toEqual(2020);
@@ -195,19 +222,31 @@ describe('movies repository', () => {
 
   describe('getAll - paging', () => {
     it('gets first page of movies', async () => {
-      const result = await repository.getAll({ page: 1, pageSize: 2 });
+      const result = await repository.getAll({
+        cancellationToken,
+        page: 1,
+        pageSize: 2,
+      });
 
       expect(result).toHaveLength(2);
     });
 
     it('gets second page of movies', async () => {
-      const result = await repository.getAll({ page: 2, pageSize: 2 });
+      const result = await repository.getAll({
+        cancellationToken,
+        page: 2,
+        pageSize: 2,
+      });
 
       expect(result).toHaveLength(1);
     });
 
     it('handles empty page', async () => {
-      const result = await repository.getAll({ page: 3, pageSize: 2 });
+      const result = await repository.getAll({
+        cancellationToken,
+        page: 3,
+        pageSize: 2,
+      });
 
       expect(result).toHaveLength(0);
     });
@@ -216,6 +255,7 @@ describe('movies repository', () => {
   describe('getAll - sorting', () => {
     it('sorts movies by title ascending', async () => {
       const result = await repository.getAll({
+        cancellationToken,
         page: 1,
         pageSize: 3,
         sortDirection: 'asc',
@@ -228,6 +268,7 @@ describe('movies repository', () => {
     });
     it('sorts movies by title descending', async () => {
       const result = await repository.getAll({
+        cancellationToken,
         page: 1,
         pageSize: 3,
         sortDirection: 'desc',
@@ -241,6 +282,7 @@ describe('movies repository', () => {
 
     it('sorts movies by year ascending', async () => {
       const result = await repository.getAll({
+        cancellationToken,
         page: 1,
         pageSize: 3,
         sortDirection: 'asc',
@@ -254,6 +296,7 @@ describe('movies repository', () => {
 
     it('sorts movies by year descending', async () => {
       const result = await repository.getAll({
+        cancellationToken,
         page: 1,
         pageSize: 3,
         sortDirection: 'desc',
@@ -268,25 +311,32 @@ describe('movies repository', () => {
 
   describe('getCount', () => {
     it('gets count of movies', async () => {
-      const result = await repository.getCount({});
+      const result = await repository.getCount({ cancellationToken });
 
       expect(result).toBe(3);
     });
 
     it('gets count of movies by title', async () => {
-      const result = await repository.getCount({ title: 'Movie 1' });
+      const result = await repository.getCount({
+        cancellationToken,
+        title: 'Movie 1',
+      });
 
       expect(result).toBe(1);
     });
 
     it('gets count of movies by year of release', async () => {
-      const result = await repository.getCount({ yearOfRelease: 2020 });
+      const result = await repository.getCount({
+        cancellationToken,
+        yearOfRelease: 2020,
+      });
 
       expect(result).toBe(1);
     });
 
     it('gets count of movies by title and year of release', async () => {
       const result = await repository.getCount({
+        cancellationToken,
         title: 'Movie 1',
         yearOfRelease: 2020,
       });
@@ -295,7 +345,10 @@ describe('movies repository', () => {
     });
 
     it('returns 0 if no movies exist', async () => {
-      const result = await repository.getCount({ title: 'Weird movie' });
+      const result = await repository.getCount({
+        cancellationToken,
+        title: 'Weird movie',
+      });
 
       expect(result).toBe(0);
     });

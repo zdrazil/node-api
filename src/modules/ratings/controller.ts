@@ -20,8 +20,10 @@ export async function createRatingController(
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
       const userId = req.user.userId;
+      const cancellationToken = req.raw.aborted;
 
       const result = await ratingService.rateMovie({
+        cancellationToken,
         movieId: req.params.id,
         rating: req.body.rating,
         userId,
@@ -45,9 +47,11 @@ export async function createRatingController(
 
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
+      const cancellationToken = req.raw.aborted;
       const userId = req.user.userId;
 
       const result = await ratingService.deleteRating({
+        cancellationToken,
         movieId: req.params.id,
         userId,
       });
@@ -70,8 +74,10 @@ export async function createRatingController(
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
       const userId = req.user.userId;
+      const cancellationToken = req.raw.aborted;
 
       const result = await ratingService.getRatingsForUser({
+        cancellationToken,
         userId,
       });
 
@@ -80,8 +86,7 @@ export async function createRatingController(
     method: 'GET',
     onRequest: fastify.auth([fastify.verifyTrustedMember]),
     schema: {
-      description: 'Delete a movie rating',
-      params: createIdDtoSchema('Movie'),
+      description: 'Get all ratings for a user',
       response: {
         200: movieRatingResponseDtoSchema,
       },

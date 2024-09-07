@@ -24,7 +24,12 @@ const stringToNumber = (str?: string | null) =>
 export type MovieRepository = ReturnType<typeof createMovieRepository>;
 
 export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
-  async function create(movie: Movie): Promise<boolean> {
+  async function create({
+    movie,
+  }: {
+    cancellationToken: boolean;
+    movie: Movie;
+  }): Promise<boolean> {
     const client = await db();
     await client.connect();
 
@@ -60,6 +65,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     id,
     userId,
   }: {
+    cancellationToken: boolean;
     id: string;
     userId: string;
   }): Promise<Movie | undefined> {
@@ -97,6 +103,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     slug,
     userId,
   }: {
+    cancellationToken: boolean;
     slug: string;
     userId?: string;
   }): Promise<Movie | undefined> {
@@ -136,6 +143,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
   async function update({
     movie,
   }: {
+    cancellationToken: boolean;
     movie: Pick<Movie, 'genres' | 'id' | 'title' | 'yearOfRelease' | 'slug'>;
   }): Promise<boolean> {
     const client = await db();
@@ -172,7 +180,12 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     }
   }
 
-  async function deleteById({ id }: { id: string }): Promise<boolean> {
+  async function deleteById({
+    id,
+  }: {
+    cancellationToken: boolean;
+    id: string;
+  }): Promise<boolean> {
     const client = await db();
     await client.connect();
 
@@ -195,7 +208,12 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     }
   }
 
-  async function existsById({ id }: { id: string }): Promise<boolean> {
+  async function existsById({
+    id,
+  }: {
+    cancellationToken: boolean;
+    id: string;
+  }): Promise<boolean> {
     const client = await db();
     await client.connect();
 
@@ -216,6 +234,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     userId,
     year,
   }: {
+    cancellationToken: boolean;
     page?: number;
     pageSize?: number;
     sortDirection?: SortDirection;
@@ -257,6 +276,7 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     title,
     yearOfRelease,
   }: {
+    cancellationToken: boolean;
     title?: string;
     yearOfRelease?: number;
   }): Promise<number> {
