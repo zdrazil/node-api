@@ -30,7 +30,7 @@ export const createMovieService = ({
     {
       cancellationToken,
       userId,
-    }: { cancellationToken: boolean; userId?: string },
+    }: { cancellationToken: boolean; userId: string },
   ): Promise<Movie | null> {
     const movieExists = await movieRepository.existsById({
       cancellationToken,
@@ -42,18 +42,6 @@ export const createMovieService = ({
     }
 
     await movieRepository.update({ cancellationToken, movie });
-
-    if (userId == null) {
-      const rating = await ratingRepository.getRatingByMovieId({
-        cancellationToken,
-        movieId: movie.id,
-      });
-
-      return {
-        ...movie,
-        rating: rating,
-      };
-    }
 
     const userRating = await ratingRepository.getRatingByMovieAndUserId({
       cancellationToken,
