@@ -1,4 +1,3 @@
-import { sql } from '../../../tooling/sql';
 import { Client } from 'pg';
 import {
   getRatingsByMovieAndUserId,

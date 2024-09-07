@@ -19,7 +19,6 @@ import {
   GetAllMoviesResponseDto,
   getAllMoviesResponseDtoSchema,
 } from './getAllMovies/schema';
-import { securityDefinitions } from '../api/authorization/securityDefinition';
 
 interface Dependencies {
   movieService: MovieService;
@@ -30,9 +29,6 @@ export async function createMovieController(
   { movieService }: Dependencies,
 ) {
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
-    // constraints: {
-    //   version: '1',
-    // },
     handler: async (req, res) => {
       const movie = createMovieRequestToMovie(req.body);
 
@@ -158,6 +154,7 @@ export async function createMovieController(
       response: {
         200: movieResponseDtoSchema,
       },
+      security: [{ BearerAuth: [] }],
       tags: ['movies'],
     },
     url: movieEndpoints.update,
@@ -179,6 +176,7 @@ export async function createMovieController(
       body: updateMovieRequestDtoSchema,
       description: 'Delete a movie by ID',
       params: createIdDtoSchema('Movie'),
+      security: [{ BearerAuth: [] }],
       tags: ['movies'],
     },
     url: movieEndpoints.delete,
