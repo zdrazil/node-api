@@ -56,10 +56,6 @@ export async function startDbEnvironment() {
     env: { ...process.env, DBMATE_DATABASE_URL: dbUrl },
   });
 
-  // execSync('yarn run db:seed', {
-  //   env: { ...process.env, DBMATE_DATABASE_URL: dbUrl },
-  // });
-
   return db;
 }
 
