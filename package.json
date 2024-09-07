@@ -27,8 +27,8 @@
     "lint:eslint": "eslint --cache \"$INIT_CWD/src/**/*.ts\" --fix",
     "lint:ts": "tsc --noEmit --incremental",
     "start": "tsx src/app.ts",
-    "test": "yarn node --experimental-vm-modules $(yarn bin jest)",
-    "test:watch": "yarn test --watch"
+    "test": "yarn node --experimental-vm-modules $(yarn bin jest) --runInBand",
+    "test:watch": "yarn test --watch --runInBand"
   },
   "dependencies": {
     "@fastify/auth": "4.6.1",
