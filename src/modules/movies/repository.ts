@@ -4,8 +4,21 @@ import { SortOrder } from '../sortOrder';
 import { SortField } from './getAllMovies/schema';
 import { Client } from 'pg';
 import { objectToCamel } from 'ts-case-convert';
+import {
+  createGenre,
+  createMovie,
+  deleteGenres,
+  deleteMovie,
+  deleteRatings,
+  getMovieById,
+  getMovieBySlug,
+  getMovieCount,
+  getMovieGenres,
+  movieExists,
+  updateMovie,
+} from './repository/movies.queries';
 
-const stringToNumber = (str?: string) =>
+const stringToNumber = (str?: string | null) =>
   str != null ? Number(str) : undefined;
 
 export type MovieRepository = ReturnType<typeof createMovieRepository>;
@@ -17,34 +30,25 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
 
     try {
       await client.query('BEGIN');
-      const movieResult = await client.query(
-        sql`
-          INSERT INTO
-            movies (id, slug, title, year_of_release)
-          VALUES
-            ($1, $2, $3, $4)
-        `,
-        [movie.id, movie.slug, movie.title, movie.yearOfRelease],
+
+      await createMovie.run(
+        {
+          id: movie.id,
+          slug: movie.slug,
+          title: movie.title,
+          year_of_release: movie.yearOfRelease,
+        },
+        client,
       );
 
-      if (movieResult.rowCount != null && movieResult.rowCount > 0) {
-        for (const genre of movie.genres) {
-          await client.query(
-            sql`
-              INSERT INTO
-                genres (movie_id, name)
-              VALUES
-                ($1, $2)
-            `,
-            [movie.id, genre],
-          );
-        }
+      for (const genre of movie.genres) {
+        await createGenre.run({ movie_id: movie.id, name: genre }, client);
       }
 
       await client.query('COMMIT');
       await client.end();
 
-      return movieResult.rowCount != null && movieResult.rowCount > 0;
+      return true;
     } catch (e) {
       await client.query('ROLLBACK');
       await client.end();
@@ -62,32 +66,9 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     const client = await db();
     await client.connect();
 
-    const movieResult = await client.query<
-      Pick<
-        MovieDb,
-        'id' | 'title' | 'year_of_release' | 'slug' | 'rating' | 'user_rating'
-      >
-    >(
-      sql`
-        SELECT
-          m.*,
-          round(avg(r.rating), 1) AS rating,
-          myr.rating AS user_rating
-        FROM
-          movies m
-          LEFT JOIN ratings r ON m.id = r.movie_id
-          LEFT JOIN ratings myr ON m.id = myr.movie_id
-          AND myr.user_id = $2
-        WHERE
-          id = $1
-        GROUP BY
-          id,
-          user_rating;
-      `,
-      [id, userId],
-    );
+    const movieResult = await getMovieById.run({ id, user_id: userId }, client);
 
-    const movie = movieResult.rows[0];
+    const movie = movieResult[0];
 
     if (!movie) {
       await client.end();
@@ -95,26 +76,18 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
       return undefined;
     }
 
-    const genresResult = await client.query<{ name: string }>(
-      sql`
-        SELECT
-          name
-        FROM
-          genres
-        WHERE
-          movie_id = $1
-      `,
-      [id],
+    const genresResult = await getMovieGenres.run(
+      { movie_id: movie.id },
+      client,
     );
 
     await client.end();
 
     const result: Movie = {
-      genres: genresResult.rows.map((row) => row.name),
+      genres: genresResult.map((row) => row.name),
       ...objectToCamel(movie),
       rating: stringToNumber(movie.rating),
-      userRating: stringToNumber(movie.user_rating),
-      yearOfRelease: Number(movie.year_of_release),
+      userRating: movie.user_rating,
     };
 
     return result;
@@ -130,32 +103,12 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     const client = await db();
     await client.connect();
 
-    const movieResult = await client.query<
-      Pick<
-        MovieDb,
-        'id' | 'title' | 'year_of_release' | 'slug' | 'rating' | 'user_rating'
-      >
-    >(
-      sql`
-        SELECT
-          m.*,
-          round(avg(r.rating), 1) AS rating,
-          myr.rating AS user_rating
-        FROM
-          movies m
-          LEFT JOIN ratings r ON m.id = r.movie_id
-          LEFT JOIN ratings myr ON m.id = myr.movie_id
-          AND myr.user_id = $2
-        WHERE
-          slug = $1
-        GROUP BY
-          id,
-          user_rating;
-      `,
-      [slug, userId],
+    const movieResult = await getMovieBySlug.run(
+      { slug, user_id: userId },
+      client,
     );
 
-    const movie = movieResult.rows[0];
+    const movie = movieResult[0];
 
     if (!movie) {
       await client.end();
@@ -163,26 +116,18 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
       return undefined;
     }
 
-    const genresResult = await client.query<{ name: string }>(
-      sql`
-        SELECT
-          name
-        FROM
-          genres
-        WHERE
-          movie_id = $1
-      `,
-      [movie.id],
+    const genresResult = await getMovieGenres.run(
+      { movie_id: movie.id },
+      client,
     );
 
     await client.end();
 
     const result: Movie = {
       ...objectToCamel(movie),
-      genres: genresResult.rows.map((row) => row.name),
+      genres: genresResult.map((row) => row.name),
       rating: stringToNumber(movie.rating),
-      userRating: stringToNumber(movie.user_rating),
-      yearOfRelease: Number(movie.year_of_release),
+      userRating: movie.user_rating,
     };
 
     return result;
@@ -199,48 +144,27 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     try {
       await client.query('BEGIN');
 
-      // Delete all genres for the movie
-      await client.query(
-        sql`
-          DELETE FROM genres
-          WHERE
-            movie_id = $1;
-        `,
-        [movie.id],
-      );
+      await deleteGenres.run({ movie_id: movie.id }, client);
 
-      // Insert new genres
       for (const genre of movie.genres) {
-        await client.query(
-          sql`
-            INSERT INTO
-              genres (movie_id, name)
-            VALUES
-              ($1, $2)
-          `,
-          [movie.id, genre],
-        );
+        await createGenre.run({ movie_id: movie.id, name: genre }, client);
       }
 
-      // Update the movie
-      const result = await client.query(
-        sql`
-          UPDATE movies
-          SET
-            slug = $1,
-            title = $2,
-            year_of_release = $3
-          WHERE
-            id = $4
-        `,
-        [movie.slug, movie.title, movie.yearOfRelease, movie.id],
+      await updateMovie.run(
+        {
+          id: movie.id,
+          slug: movie.slug,
+          title: movie.title,
+          year_of_release: movie.yearOfRelease,
+        },
+        client,
       );
 
       await client.query('COMMIT');
 
       await client.end();
 
-      return result.rowCount != null && result.rowCount > 0;
+      return true;
     } catch (e) {
       await client.query('ROLLBACK');
       await client.end();
@@ -255,41 +179,15 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     try {
       await client.query('BEGIN');
 
-      // Delete the genres
-      await client.query(
-        sql`
-          DELETE FROM genres
-          WHERE
-            movie_id = $1;
-        `,
-        [id],
-      );
-
-      // Delete ratings
-      await client.query(
-        sql`
-          DELETE FROM ratings
-          WHERE
-            movie_id = $1;
-        `,
-        [id],
-      );
-
-      // Delete the movie
-      const result = await client.query(
-        sql`
-          DELETE FROM movies
-          WHERE
-            id = $1;
-        `,
-        [id],
-      );
+      await deleteGenres.run({ movie_id: id }, client);
+      await deleteRatings.run({ movie_id: id }, client);
+      await deleteMovie.run({ id }, client);
 
       await client.query('COMMIT');
 
       await client.end();
 
-      return result.rowCount != null && result.rowCount > 0;
+      return true;
     } catch (e) {
       await client.query('ROLLBACK');
       await client.end();
@@ -301,24 +199,12 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     const client = await db();
     await client.connect();
 
-    // Exists
-    const result = await client.query<{ count: number }>(
-      sql`
-        SELECT
-          count(1)
-        FROM
-          movies
-        WHERE
-          id = $1;
-      `,
-      [id],
-    );
-
+    const result = await movieExists.run({ id }, client);
     await client.end();
 
-    const firstRow = result.rows[0];
+    const count = result[0]?.count;
 
-    return firstRow == null ? false : firstRow.count > 0;
+    return count == null ? false : Number(count) > 0;
   }
 
   async function getAll({
@@ -409,28 +295,17 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     const client = await db();
     await client.connect();
 
-    const result = await client.query<{ count: string }>(
-      sql`
-        SELECT
-          count(id)
-        FROM
-          movies
-        WHERE
-          (
-            $1::TEXT IS NULL
-            OR title LIKE ('%' || $1 || '%')
-          )
-          AND (
-            $2::INTEGER IS NULL
-            OR year_of_release = $2
-          )
-      `,
-      [title, yearOfRelease],
+    const result = await getMovieCount.run(
+      {
+        title,
+        year_of_release: yearOfRelease,
+      },
+      client,
     );
 
     await client.end();
 
-    return stringToNumber(result.rows[0]?.count) ?? 0;
+    return stringToNumber(result[0]?.count) ?? 0;
   }
 
   return {

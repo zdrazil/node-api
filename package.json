@@ -15,6 +15,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "db": "dbmate h",
+    "db:codegen": "pgtyped -c pgtyped.json",
     "db:create-migration": "dbmate new",
     "db:create-seed": "dbmate -e DBMATE_DATABASE_URL -d ./db/seeds/ new",
     "db:migrate": "dbmate -e DBMATE_DATABASE_URL up",
@@ -45,6 +46,7 @@
     "@fastify/type-provider-typebox": "4.1.0",
     "@fastify/under-pressure": "8.5.1",
     "@gquittet/graceful-server": "5.2.1",
+    "@pgtyped/runtime": "^2.3.0",
     "@sinclair/typebox": "0.33.7",
     "awilix": "10.0.2",
     "dbmate": "2.20.0",
@@ -61,6 +63,7 @@
     "@eslint/compat": "1.1.0",
     "@eslint/js": "9.6.0",
     "@ianvs/prettier-plugin-sort-imports": "4.3.0",
+    "@pgtyped/cli": "^2.3.0",
     "@types/eslint-config-prettier": "6.11.3",
     "@types/eslint__js": "8.42.3",
     "@types/jest": "29.5.12",

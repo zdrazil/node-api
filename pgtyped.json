@@ -1,0 +1,18 @@
+{
+  "transforms": [
+    {
+      "mode": "sql",
+      "include": "**/*.sql",
+      "emitTemplate": "{{dir}}/{{name}}.queries.ts"
+    }
+  ],
+  "srcDir": "./src/",
+  "failOnError": false,
+  "db": {
+    "host": "127.0.0.1",
+    "user": "admin",
+    "dbName": "test",
+    "port": 5432,
+    "password": "test"
+  }
+}

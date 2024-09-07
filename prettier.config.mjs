@@ -1,9 +1,9 @@
 const sqlSettings = {
-  embeddedSqlTags: ['sql'],
-  keywordCase: 'upper',
   dataTypeCase: 'upper',
-  functionCase: 'lower',
+  embeddedSqlTags: ['sql'],
   expressionWidth: 150,
+  functionCase: 'lower',
+  keywordCase: 'upper',
   language: 'postgresql',
 };
 
