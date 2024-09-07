@@ -40,6 +40,7 @@ export async function createRatingController(
       response: {
         200: createIdDtoSchema('Rating'),
       },
+      security: [{ BearerAuth: [] }],
       tags: ['ratings'],
     },
     url: ratingEndpoints.create,
@@ -66,6 +67,7 @@ export async function createRatingController(
       response: {
         200: createIdDtoSchema('Rating'),
       },
+      security: [{ BearerAuth: [] }],
       tags: ['ratings'],
     },
     url: ratingEndpoints.delete,
@@ -90,6 +92,7 @@ export async function createRatingController(
       response: {
         200: movieRatingResponseDtoSchema,
       },
+      security: [{ BearerAuth: [] }],
       tags: ['ratings'],
     },
     url: ratingEndpoints.getUserRatings,

@@ -110,6 +110,19 @@ describe('movies repository', () => {
       expect(result).toEqual(movie);
     });
 
+    it('gets a movie by id without userId', async () => {
+      const movie = await prepareMovie(movie1);
+      const { slug } = movie;
+
+      const result = await movieRepository.getBySlug({
+        cancellationToken,
+        slug,
+        userId: undefined,
+      });
+
+      expect(result).toEqual({ ...movie, userRating: null });
+    });
+
     it('returns undefined if movie does not exist', async () => {
       const id = randomUUID();
       const userId = randomUUID();
@@ -136,6 +149,19 @@ describe('movies repository', () => {
       });
 
       expect(result).toEqual(movie);
+    });
+
+    it('gets a movie by slug without userId', async () => {
+      const movie = await prepareMovie(movie1);
+      const { slug } = movie;
+
+      const result = await movieRepository.getBySlug({
+        cancellationToken,
+        slug,
+        userId: undefined,
+      });
+
+      expect(result).toEqual({ ...movie, userRating: null });
     });
   });
 
