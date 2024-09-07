@@ -9,7 +9,7 @@ export const tokenPath = apiBase + '/token';
 export async function createIdentityController(fastify: FastifyRouteInstance) {
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
-      const token = createJwtToken(fastify, req.body);
+      const token = await createJwtToken(fastify, req.body);
       await res.send({ token });
     },
     method: 'POST',
