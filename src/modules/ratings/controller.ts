@@ -7,13 +7,12 @@ import { ratingEndpoints } from './endpoints';
 import { rateMovieRequestDtoSchema } from './rateMovie/schema';
 
 interface Dependencies {
-  movieService: MovieService;
   ratingService: RatingService;
 }
 
 export async function createRatingController(
   fastify: FastifyRouteInstance,
-  { movieService, ratingService }: Dependencies,
+  { ratingService }: Dependencies,
 ) {
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
