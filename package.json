@@ -2,13 +2,13 @@
   "name": "node-api",
   "version": "0.0.1",
   "private": true,
-  "description": "",
+  "description": "Backend service for managing movies and their ratings",
   "homepage": "https://github.com/zdrazil/node-api#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zdrazil/node-api"
   },
-  "license": "UNLICENSED",
+  "license": "MIT",
   "author": "Vladimir Zdrazil",
   "type": "module",
   "main": "src/app.js",
