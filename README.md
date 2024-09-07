@@ -101,6 +101,7 @@ To test database interactions, we use a separate test database that is created a
 - [ ] Probably wrong handling of floating point numbers. We could use something like [decimal.js](https://mikemcl.github.io/decimal.js/).
 - [ ] We're using `LIKE` for searching movies, which is not very efficient. We could use a full-text search engine like [Elasticsearch](https://www.elastic.co/elastic-stack) or [Algolia](https://www.algolia.com/).
 - [ ] CI and CD are not set up.
+- [ ] Create an intersection table for genres and movies.
 
 ## Notes
 
