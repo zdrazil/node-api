@@ -1,7 +1,6 @@
-import { MovieDb, Movie } from './models';
-import { sql } from '../../tooling/sql';
-import { SortDirection } from '../sortDirection';
-import { SortField } from './getAllMovies/schema';
+import { Movie } from '../models';
+import { SortDirection } from '../../sortDirection';
+import { SortField } from '../getAllMovies/schema';
 import { Client } from 'pg';
 import { objectToCamel } from 'ts-case-convert';
 import {
@@ -17,7 +16,7 @@ import {
   getMovieGenres,
   movieExists,
   updateMovie,
-} from './repository/movies.queries';
+} from './movies.queries';
 
 const stringToNumber = (str?: string | null) =>
   str != null ? Number(str) : undefined;

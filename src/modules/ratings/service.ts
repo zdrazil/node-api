@@ -1,4 +1,4 @@
-import { MovieRepository } from '../movies/repository';
+import { MovieRepository } from '../movies/repository/repository';
 import { RatingRepository } from './repository';
 
 export type RatingService = ReturnType<typeof createRatingService>;

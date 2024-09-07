@@ -4,7 +4,7 @@ import AutoLoad from '@fastify/autoload';
 import path from 'node:path';
 import fastifyPostgres from '@fastify/postgres';
 import { execSync } from 'node:child_process';
-import { createMovieRepository } from '../movies/repository';
+import { createMovieRepository } from '../movies/repository/repository';
 import { createRatingRepository } from '../ratings/repository';
 import { createMovieService } from '../movies/service';
 import { createRatingService } from '../ratings/service';

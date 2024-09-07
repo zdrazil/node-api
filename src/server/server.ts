@@ -8,7 +8,7 @@ import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import UnderPressure from '@fastify/under-pressure';
 import { FastifyInstance } from 'fastify';
 import { env } from '../config/env';
-import { createMovieRepository } from '../modules/movies/repository';
+import { createMovieRepository } from '../modules/movies/repository/repository';
 import { createRatingRepository } from '../modules/ratings/repository';
 import { createMovieService } from '../modules/movies/service';
 import { createRatingService } from '../modules/ratings/service';

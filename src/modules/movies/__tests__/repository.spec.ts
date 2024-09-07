@@ -1,7 +1,10 @@
 import { createDb, startDbEnvironment } from '../../testing/db';
 import { StartedDockerComposeEnvironment } from 'testcontainers';
 import { Movie } from '../models';
-import { createMovieRepository, MovieRepository } from '../repository';
+import {
+  createMovieRepository,
+  MovieRepository,
+} from '../repository/repository';
 import { randomUUID } from 'crypto';
 
 describe('movies repository', () => {
