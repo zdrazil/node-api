@@ -19,7 +19,6 @@ import {
   GetAllMoviesResponseDto,
   getAllMoviesResponseDtoSchema,
 } from './getAllMovies/schema';
-import { randomUUID } from 'crypto';
 
 interface Dependencies {
   movieService: MovieService;
