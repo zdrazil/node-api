@@ -1,4 +1,4 @@
-import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
+import { Type, TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { FastifyRouteInstance } from '../../types';
 import { createIdDtoSchema, isUuid } from '../api/id';
 import { ConflictException } from '../api/exceptions';
@@ -63,13 +63,22 @@ export async function createMovieController(
 
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
-      const { id } = req.params;
-      const userId = req.user.userId;
+      const { idOrSlug } = req.params;
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      const userId = req.user?.userId;
       const cancellationToken = req.raw.aborted;
 
-      const movie = isUuid(id)
-        ? await movieService.getById({ cancellationToken, id, userId })
-        : await movieService.getBySlug({ cancellationToken, slug: id, userId });
+      const movie = isUuid(idOrSlug)
+        ? await movieService.getById({
+            cancellationToken,
+            id: idOrSlug,
+            userId,
+          })
+        : await movieService.getBySlug({
+            cancellationToken,
+            slug: idOrSlug,
+            userId,
+          });
 
       if (!movie) {
         return res.status(404).send();
@@ -81,8 +90,13 @@ export async function createMovieController(
     },
     method: 'GET',
     schema: {
-      description: 'Get a movie by ID',
-      params: createIdDtoSchema('Movie'),
+      description: 'Get a movie by ID or slug',
+      params: Type.Object({
+        idOrSlug: Type.String({
+          description: `Movies's id or slug`,
+          example: '2cdc8ab1-6d50-49cc-ba14-54e4ac7ec231',
+        }),
+      }),
       response: {
         200: movieResponseDtoSchema,
       },
@@ -94,6 +108,7 @@ export async function createMovieController(
   fastify.withTypeProvider<TypeBoxTypeProvider>().route({
     handler: async (req, res) => {
       const { order, page, perPage, sortBy, title, year } = req.query;
+
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       const userId = req.user?.userId;
       const cancellationToken = req.raw.aborted;

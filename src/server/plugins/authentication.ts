@@ -13,6 +13,14 @@ async function authenticationPlugin(fastify: FastifyInstance) {
     secret: env.tokenSecret,
   });
 
+  fastify.addHook('onRequest', async (request, reply) => {
+    try {
+      await request.jwtVerify();
+    } catch (err) {
+      // Some requests don't require authentication, but if the token is there, we want to use its info. For example a user ID.
+    }
+  });
+
   fastify.decorate(
     'authenticate',
     async function (request: FastifyRequest, reply: FastifyReply) {
