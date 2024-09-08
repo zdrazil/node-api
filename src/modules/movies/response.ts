@@ -47,12 +47,15 @@ export const movieResponseDtoSchema = Type.Object({
     minLength: 1,
   }),
   userRating: Type.Optional(
-    Type.Number({
-      description: 'User rating',
-      example: 4.5,
-      maximum: 5,
-      minimum: 0,
-    }),
+    Type.Union([
+      Type.Null(),
+      Type.Number({
+        description: 'User rating',
+        example: 4.5,
+        maximum: 5,
+        minimum: 0,
+      }),
+    ]),
   ),
   yearOfRelease: Type.Number({
     description: 'Year of release',
