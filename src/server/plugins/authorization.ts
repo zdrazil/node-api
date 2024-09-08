@@ -6,6 +6,15 @@ import {
   FastifyInstance,
   HookHandlerDoneFunction,
 } from 'fastify';
+import { ExceptionBase } from '../../modules/api/exceptions';
+
+/**
+ * Used to indicate that the user is not authorized to access a resource.
+ */
+class AuthorizationError extends ExceptionBase {
+  readonly statusCode = 401;
+  readonly error = 'Unauthorized';
+}
 
 export type Authorize = (
   request: FastifyRequest,
@@ -23,7 +32,7 @@ async function authorizationPlugin(fastify: FastifyInstance) {
 
       const isAdmin = request.user.admin ?? false;
       if (!isAdmin) {
-        throw new Error('Unauthorized');
+        throw new AuthorizationError('Unauthorized');
       }
     },
   );
@@ -35,7 +44,7 @@ async function authorizationPlugin(fastify: FastifyInstance) {
 
       const isTrustedMember = request.user.trustedMember ?? false;
       if (!isTrustedMember) {
-        throw new Error('Unauthorized');
+        throw new AuthorizationError('Unauthorized');
       }
     },
   );

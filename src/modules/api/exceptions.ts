@@ -55,10 +55,6 @@ export abstract class ExceptionBase extends Error {
 
 /**
  * Used to indicate that an incorrect argument was provided to a
- * method/function/class constructor
- *
- * @class ArgumentInvalidException
- * @extends {ExceptionBase}
  */
 export class ArgumentInvalidException extends ExceptionBase {
   readonly statusCode = 400;
@@ -67,9 +63,6 @@ export class ArgumentInvalidException extends ExceptionBase {
 
 /**
  * Used to indicate conflicting entities (usually in the database)
- *
- * @class ConflictException
- * @extends {ExceptionBase}
  */
 export class ConflictException extends ExceptionBase {
   readonly error = 'Conflict';
@@ -78,9 +71,6 @@ export class ConflictException extends ExceptionBase {
 
 /**
  * Used to indicate that entity is not found
- *
- * @class NotFoundException
- * @extends {ExceptionBase}
  */
 export class NotFoundException extends ExceptionBase {
   static readonly message = 'Not found';
@@ -95,9 +85,6 @@ export class NotFoundException extends ExceptionBase {
 /**
  * Used to indicate an internal server error that does not fall under all other
  * errors
- *
- * @class InternalServerErrorException
- * @extends {ExceptionBase}
  */
 export class InternalServerErrorException extends ExceptionBase {
   static readonly message = 'Internal server error';

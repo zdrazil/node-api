@@ -30,6 +30,16 @@ const fastifyErrorCodesMap: Record<
       path: validationError.instancePath,
     })), // https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1
   }),
+  FST_JWT_AUTHORIZATION_TOKEN_INVALID: () => ({
+    error: 'Unauthorized',
+    message: 'Invalid authorization token',
+    statusCode: 401,
+  }),
+  FST_JWT_NO_AUTHORIZATION_IN_HEADER: () => ({
+    error: 'Unauthorized',
+    message: 'No authorization header provided',
+    statusCode: 401,
+  }),
 };
 
 async function errorHandlerPlugin(fastify: FastifyInstance) {
