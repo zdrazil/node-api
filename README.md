@@ -102,6 +102,8 @@ To test database interactions, we use a separate test database that is created a
 - [ ] We're using `LIKE` for searching movies, which is not very efficient. We could use a full-text search engine like [Elasticsearch](https://www.elastic.co/elastic-stack) or [Algolia](https://www.algolia.com/).
 - [ ] CI and CD are not set up.
 - [ ] Create an intersection table for genres and movies.
+- [ ] Service layer is not covered by tests.
+- [ ] Handle aborts somehow. We're passing cancellation tokens to our queries, but we're not using them. Is it something that's not needed with Fastify? I'm not sure.
 
 ## Notes
 
