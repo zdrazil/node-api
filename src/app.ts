@@ -3,6 +3,7 @@ import GracefulServer from '@gquittet/graceful-server';
 import Fastify from 'fastify';
 import { env } from './config/env';
 import { createServer } from './server/server';
+import { codegenMercurius, gql } from 'mercurius-codegen';
 
 async function init() {
   const fastify = Fastify({
