@@ -1,8 +1,7 @@
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
-import { FastifyRouteInstance } from '../../types';
-import { createIdDtoSchema } from '../api/id';
-import { MovieService } from '../movies/service';
-import { RatingService } from './service';
+import { FastifyRouteInstance } from '../../../types';
+import { createIdDtoSchema } from '../../api/id';
+import { RatingService } from '../service';
 import { ratingEndpoints } from './endpoints';
 import {
   movieRatingResponseDtoSchema,

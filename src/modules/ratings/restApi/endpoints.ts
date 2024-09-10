@@ -1,4 +1,4 @@
-import { apiBase } from '../api/endpoints';
+import { apiBase } from '../../api/endpoints';
 
 const ratingBase = `${apiBase}/ratings`;
 

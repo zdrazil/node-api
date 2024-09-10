@@ -7,8 +7,8 @@ import { createMovieRepository } from '../movies/repository/repository';
 import { createRatingRepository } from '../ratings/repository/repository';
 import { createMovieService } from '../movies/service';
 import { createRatingService } from '../ratings/service';
-import { createRatingController } from '../ratings/controller';
-import { createMovieController } from '../movies/controller';
+import { createRatingController } from '../ratings/restApi/controller';
+import { createMovieController } from '../movies/restApi/controller';
 import { createIdentityController } from '../identity/controller';
 import {
   DockerComposeEnvironment,

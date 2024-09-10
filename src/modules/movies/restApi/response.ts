@@ -1,5 +1,5 @@
 import { Static, Type } from '@sinclair/typebox';
-import { Movie } from './models';
+import { Movie } from '../models';
 
 export const movieToMovieResponse = ({
   genres,

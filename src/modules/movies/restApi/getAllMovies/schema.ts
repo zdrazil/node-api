@@ -1,8 +1,8 @@
 import { Static, Type } from '@sinclair/typebox';
-import { pagedRequestDescription } from '../../api/paging';
-import { sortDirectionSchema } from '../../api/sortDirection';
+import { pagedRequestDescription } from '../../../api/paging';
+import { sortDirectionSchema } from '../../../api/sortDirection';
 import { movieResponseDtoSchema } from '../response';
-import { StringEnum } from '../../../types';
+import { StringEnum } from '../../../../types';
 
 const sortFieldSchema = StringEnum(['title', 'year']);
 

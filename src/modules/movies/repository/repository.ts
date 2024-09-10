@@ -1,6 +1,6 @@
 import { Movie } from '../models';
 import { SortDirection } from '../../api/sortDirection';
-import { SortField } from '../getAllMovies/schema';
+import { SortField } from '../restApi/getAllMovies/schema';
 import { Client } from 'pg';
 import { objectToCamel } from 'ts-case-convert';
 import {

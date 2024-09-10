@@ -1,26 +1,24 @@
-import { randomUUID } from 'node:crypto';
 import { Static, Type } from '@sinclair/typebox';
-import { Movie } from '../models';
+import { Movie } from '../../models';
 
-export const createMovieRequestToMovie = ({
-  genres,
-  title,
-  year,
-}: CreateMovieRequestDto): Movie => {
+export const updateMovieRequestToMovie = (
+  { genres, title, year }: UpdateMovieRequestDto,
+  id: string,
+): Movie => {
   const sluggedTitle = title.toLowerCase().replace(/ /g, '-');
 
   return {
     genres,
-    id: randomUUID(),
+    id,
     slug: sluggedTitle,
     title,
     yearOfRelease: year,
   };
 };
 
-type CreateMovieRequestDto = Static<typeof createMovieRequestDtoSchema>;
+type UpdateMovieRequestDto = Static<typeof updateMovieRequestDtoSchema>;
 
-export const createMovieRequestDtoSchema = Type.Object({
+export const updateMovieRequestDtoSchema = Type.Object({
   genres: Type.Array(
     Type.String({
       description: 'Genres',

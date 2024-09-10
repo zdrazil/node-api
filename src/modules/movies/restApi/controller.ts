@@ -1,14 +1,14 @@
 import { Type, TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
-import { FastifyRouteInstance } from '../../types';
-import { createIdDtoSchema, isUuid } from '../api/id';
-import { ConflictException } from '../api/exceptions';
+import { FastifyRouteInstance } from '../../../types';
+import { createIdDtoSchema, isUuid } from '../../api/id';
+import { ConflictException } from '../../api/exceptions';
 import {
   createMovieRequestDtoSchema,
   createMovieRequestToMovie,
 } from './createMovie/schema';
 import { movieEndpoints } from './endpoints';
-import { MovieAlreadyExistsError } from './errors';
-import { MovieService } from './service';
+import { MovieAlreadyExistsError } from '../errors';
+import { MovieService } from '../service';
 import {
   updateMovieRequestDtoSchema,
   updateMovieRequestToMovie,
