@@ -1,6 +1,8 @@
+import { SortDirection } from '../api/sortDirection';
 import { RatingRepository } from '../ratings/repository/repository';
 import { Movie } from './models';
 import { MovieRepository } from './repository/repository';
+import { SortField } from './restApi/getAllMovies/schema';
 
 export type MovieService = ReturnType<typeof createMovieService>;
 
@@ -62,10 +64,44 @@ export const createMovieService = ({
 
   const getAll = movieRepository.getAll;
 
+  async function getAllWithCursor({
+    after,
+    cancellationToken,
+    first = 1,
+    sortDirection: sortDirection,
+    sortField,
+    title,
+    userId,
+    year,
+  }: {
+    after?: string | null;
+    cancellationToken: boolean;
+    first?: number | null;
+    sortDirection?: SortDirection | null;
+    sortField?: SortField | null;
+    title?: string | null;
+    userId?: string | null;
+    year?: number | null;
+  }) {
+    const result = await movieRepository.getAllWithCursor({
+      after,
+      cancellationToken,
+      first,
+      sortDirection,
+      sortField,
+      title,
+      userId,
+      year,
+    });
+
+    return result;
+  }
+
   return {
     create,
     deleteById,
     getAll,
+    getAllWithCursor,
     getById,
     getBySlug,
     getCount,

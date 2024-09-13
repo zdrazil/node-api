@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { Static, Type } from '@sinclair/typebox';
+import { v7 as uuidv7 } from 'uuid';
 import { Movie } from '../../models';
 
 export const createMovieRequestToMovie = ({
@@ -11,7 +12,7 @@ export const createMovieRequestToMovie = ({
 
   return {
     genres,
-    id: randomUUID(),
+    id: uuidv7(),
     slug: sluggedTitle,
     title,
     yearOfRelease: year,

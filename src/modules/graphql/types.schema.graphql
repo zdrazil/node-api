@@ -1,0 +1,9 @@
+enum OrderDirection {
+  asc
+  desc
+}
+
+enum SortByField {
+  TITLE
+  YEAR
+}

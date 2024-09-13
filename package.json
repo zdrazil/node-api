@@ -63,7 +63,9 @@
     "node-postgres": "0.6.2",
     "pg": "8.12.0",
     "postgres": "3.4.4",
-    "ts-case-convert": "2.0.7"
+    "relay-pagination-directive": "1.0.2",
+    "ts-case-convert": "2.0.7",
+    "uuid": "10.0.0"
   },
   "devDependencies": {
     "@eslint/compat": "1.1.0",
@@ -75,6 +77,7 @@
     "@types/jest": "29.5.12",
     "@types/node": "20.14.10",
     "@types/pg": "8.11.6",
+    "@types/uuid": "^10",
     "@typescript-eslint/parser": "7.16.0",
     "concurrently": "8.2.2",
     "eslint": "9.6.0",

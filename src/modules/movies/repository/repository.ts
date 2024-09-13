@@ -10,6 +10,7 @@ import {
   deleteMovie,
   deleteRatings,
   getAllMovies,
+  getAllMoviesWithCursor,
   getMovieById,
   getMovieBySlug,
   getMovieCount,
@@ -297,11 +298,58 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
     return stringToNumber(result[0]?.count) ?? 0;
   }
 
+  async function getAllWithCursor({
+    after,
+    first,
+    sortDirection: sortDirection,
+    sortField,
+    title,
+    userId,
+    year,
+  }: {
+    after?: string;
+    cancellationToken: boolean;
+    first: number;
+    sortDirection?: SortDirection;
+    sortField?: SortField;
+    title?: string;
+    userId?: string;
+    year?: number;
+  }) {
+    const client = await db();
+    await client.connect();
+
+    const result = await getAllMoviesWithCursor.run(
+      {
+        after,
+        first,
+        sort_column: sortField,
+        sort_direction: sortDirection,
+        title,
+        user_id: userId,
+        year_of_release: year,
+      },
+      client,
+    );
+
+    await client.end();
+
+    return result.map(
+      (movie): Movie => ({
+        ...objectToCamel(movie),
+        genres: movie.genres?.split(',') ?? [],
+        rating: stringToNumber(movie.rating),
+        userRating: movie.user_rating,
+      }),
+    );
+  }
+
   return {
     create,
     deleteById,
     existsById,
     getAll,
+    getAllWithCursor,
     getById,
     getBySlug,
     getCount,

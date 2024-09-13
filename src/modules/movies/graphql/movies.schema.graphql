@@ -1,3 +1,28 @@
+type Movie {
+  id: ID!
+  title: String!
+  yearOfRelease: Int!
+  genres: [String!]!
+  rating: Float
+  userRating: Float
+}
+
+enum MovieSortField {
+  TITLE
+  YEAR
+}
+
+enum SortOrder {
+  ASC
+  DESC
+}
+
 type Query {
-  add(x: Int, y: Int): Int
+  movies(
+    title: String
+    year: Int
+    sortField: MovieSortField
+    sortOrder: SortOrder
+  ): [Movie!]! @connection
+  movie(idOrSlug: String!): Movie
 }

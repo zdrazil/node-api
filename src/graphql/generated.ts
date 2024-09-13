@@ -19,6 +19,9 @@ export type ResolverFn<TResult, TParent, TContext, TArgs> = (
 ) =>
   | Promise<import("mercurius-codegen").DeepPartial<TResult>>
   | import("mercurius-codegen").DeepPartial<TResult>;
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & {
+  [P in K]-?: NonNullable<T[P]>;
+};
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -29,20 +32,81 @@ export type Scalars = {
   _FieldSet: any;
 };
 
+export enum OrderDirection {
+  asc = "asc",
+  desc = "desc",
+}
+
+export enum SortByField {
+  TITLE = "TITLE",
+  YEAR = "YEAR",
+}
+
+export type Movie = {
+  __typename?: "Movie";
+  id: Scalars["ID"];
+  title: Scalars["String"];
+  yearOfRelease: Scalars["Int"];
+  genres: Array<Scalars["String"]>;
+  rating?: Maybe<Scalars["Float"]>;
+  userRating?: Maybe<Scalars["Float"]>;
+};
+
+export enum MovieSortField {
+  TITLE = "TITLE",
+  YEAR = "YEAR",
+}
+
+export enum SortOrder {
+  ASC = "ASC",
+  DESC = "DESC",
+}
+
 export type Query = {
   __typename?: "Query";
-  add?: Maybe<Scalars["Int"]>;
-  remove?: Maybe<Scalars["Int"]>;
+  movies: MovieConnection;
+  movie?: Maybe<Movie>;
+  myRatings: Array<Rating>;
 };
 
-export type QueryaddArgs = {
-  x?: InputMaybe<Scalars["Int"]>;
-  y?: InputMaybe<Scalars["Int"]>;
+export type QuerymoviesArgs = {
+  title?: InputMaybe<Scalars["String"]>;
+  year?: InputMaybe<Scalars["Int"]>;
+  sortField?: InputMaybe<MovieSortField>;
+  sortOrder?: InputMaybe<SortOrder>;
+  first?: InputMaybe<Scalars["Int"]>;
+  after?: InputMaybe<Scalars["ID"]>;
 };
 
-export type QueryremoveArgs = {
-  x?: InputMaybe<Scalars["Int"]>;
-  y?: InputMaybe<Scalars["Int"]>;
+export type QuerymovieArgs = {
+  idOrSlug: Scalars["String"];
+};
+
+export type Rating = {
+  __typename?: "Rating";
+  id: Scalars["ID"];
+  movie: Movie;
+  rating: Scalars["Int"];
+};
+
+export type PageInfo = {
+  __typename?: "PageInfo";
+  startCursor?: Maybe<Scalars["String"]>;
+  endCursor?: Maybe<Scalars["String"]>;
+  hasNextPage: Scalars["Boolean"];
+  hasPreviousPage: Scalars["Boolean"];
+};
+
+export type MovieEdge = {
+  __typename?: "MovieEdge";
+  cursor: Scalars["ID"];
+  node?: Maybe<Movie>;
+};
+
+export type MovieConnection = {
+  __typename?: "MovieConnection";
+  edges: Array<MovieEdge>;
+  pageInfo: PageInfo;
 };
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -145,18 +209,65 @@ export type DirectiveResolverFn<
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  Query: ResolverTypeWrapper<{}>;
-  Int: ResolverTypeWrapper<Scalars["Int"]>;
-  Boolean: ResolverTypeWrapper<Scalars["Boolean"]>;
+  OrderDirection: OrderDirection;
+  SortByField: SortByField;
+  Movie: ResolverTypeWrapper<Movie>;
+  ID: ResolverTypeWrapper<Scalars["ID"]>;
   String: ResolverTypeWrapper<Scalars["String"]>;
+  Int: ResolverTypeWrapper<Scalars["Int"]>;
+  Float: ResolverTypeWrapper<Scalars["Float"]>;
+  MovieSortField: MovieSortField;
+  SortOrder: SortOrder;
+  Query: ResolverTypeWrapper<{}>;
+  Rating: ResolverTypeWrapper<Rating>;
+  PageInfo: ResolverTypeWrapper<PageInfo>;
+  Boolean: ResolverTypeWrapper<Scalars["Boolean"]>;
+  MovieEdge: ResolverTypeWrapper<MovieEdge>;
+  MovieConnection: ResolverTypeWrapper<MovieConnection>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  Query: {};
-  Int: Scalars["Int"];
-  Boolean: Scalars["Boolean"];
+  Movie: Movie;
+  ID: Scalars["ID"];
   String: Scalars["String"];
+  Int: Scalars["Int"];
+  Float: Scalars["Float"];
+  Query: {};
+  Rating: Rating;
+  PageInfo: PageInfo;
+  Boolean: Scalars["Boolean"];
+  MovieEdge: MovieEdge;
+  MovieConnection: MovieConnection;
+};
+
+export type connectionDirectiveArgs = {
+  prefix?: Maybe<Scalars["String"]>;
+};
+
+export type connectionDirectiveResolver<
+  Result,
+  Parent,
+  ContextType = MercuriusContext,
+  Args = connectionDirectiveArgs,
+> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
+export type MovieResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends
+    ResolversParentTypes["Movie"] = ResolversParentTypes["Movie"],
+> = {
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  title?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  yearOfRelease?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  genres?: Resolver<Array<ResolversTypes["String"]>, ParentType, ContextType>;
+  rating?: Resolver<Maybe<ResolversTypes["Float"]>, ParentType, ContextType>;
+  userRating?: Resolver<
+    Maybe<ResolversTypes["Float"]>,
+    ParentType,
+    ContextType
+  >;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type QueryResolvers<
@@ -164,26 +275,162 @@ export type QueryResolvers<
   ParentType extends
     ResolversParentTypes["Query"] = ResolversParentTypes["Query"],
 > = {
-  add?: Resolver<
-    Maybe<ResolversTypes["Int"]>,
+  movies?: Resolver<
+    ResolversTypes["MovieConnection"],
     ParentType,
     ContextType,
-    Partial<QueryaddArgs>
+    Partial<QuerymoviesArgs>
   >;
-  remove?: Resolver<
-    Maybe<ResolversTypes["Int"]>,
+  movie?: Resolver<
+    Maybe<ResolversTypes["Movie"]>,
     ParentType,
     ContextType,
-    Partial<QueryremoveArgs>
+    RequireFields<QuerymovieArgs, "idOrSlug">
   >;
+  myRatings?: Resolver<
+    Array<ResolversTypes["Rating"]>,
+    ParentType,
+    ContextType
+  >;
+};
+
+export type RatingResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends
+    ResolversParentTypes["Rating"] = ResolversParentTypes["Rating"],
+> = {
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  movie?: Resolver<ResolversTypes["Movie"], ParentType, ContextType>;
+  rating?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PageInfoResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends
+    ResolversParentTypes["PageInfo"] = ResolversParentTypes["PageInfo"],
+> = {
+  startCursor?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  endCursor?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  hasNextPage?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
+  hasPreviousPage?: Resolver<
+    ResolversTypes["Boolean"],
+    ParentType,
+    ContextType
+  >;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MovieEdgeResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends
+    ResolversParentTypes["MovieEdge"] = ResolversParentTypes["MovieEdge"],
+> = {
+  cursor?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  node?: Resolver<Maybe<ResolversTypes["Movie"]>, ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MovieConnectionResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends
+    ResolversParentTypes["MovieConnection"] = ResolversParentTypes["MovieConnection"],
+> = {
+  edges?: Resolver<Array<ResolversTypes["MovieEdge"]>, ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes["PageInfo"], ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = MercuriusContext> = {
+  Movie?: MovieResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Rating?: RatingResolvers<ContextType>;
+  PageInfo?: PageInfoResolvers<ContextType>;
+  MovieEdge?: MovieEdgeResolvers<ContextType>;
+  MovieConnection?: MovieConnectionResolvers<ContextType>;
 };
 
-export interface Loaders {}
+export type DirectiveResolvers<ContextType = MercuriusContext> = {
+  connection?: connectionDirectiveResolver<any, any, ContextType>;
+};
 
+export type Loader<TReturn, TObj, TParams, TContext> = (
+  queries: Array<{
+    obj: TObj;
+    params: TParams;
+  }>,
+  context: TContext & {
+    reply: import("fastify").FastifyReply;
+  },
+) => Promise<Array<import("mercurius-codegen").DeepPartial<TReturn>>>;
+export type LoaderResolver<TReturn, TObj, TParams, TContext> =
+  | Loader<TReturn, TObj, TParams, TContext>
+  | {
+      loader: Loader<TReturn, TObj, TParams, TContext>;
+      opts?: {
+        cache?: boolean;
+      };
+    };
+export interface Loaders<
+  TContext = import("mercurius").MercuriusContext & {
+    reply: import("fastify").FastifyReply;
+  },
+> {
+  Movie?: {
+    id?: LoaderResolver<Scalars["ID"], Movie, {}, TContext>;
+    title?: LoaderResolver<Scalars["String"], Movie, {}, TContext>;
+    yearOfRelease?: LoaderResolver<Scalars["Int"], Movie, {}, TContext>;
+    genres?: LoaderResolver<Array<Scalars["String"]>, Movie, {}, TContext>;
+    rating?: LoaderResolver<Maybe<Scalars["Float"]>, Movie, {}, TContext>;
+    userRating?: LoaderResolver<Maybe<Scalars["Float"]>, Movie, {}, TContext>;
+  };
+
+  Rating?: {
+    id?: LoaderResolver<Scalars["ID"], Rating, {}, TContext>;
+    movie?: LoaderResolver<Movie, Rating, {}, TContext>;
+    rating?: LoaderResolver<Scalars["Int"], Rating, {}, TContext>;
+  };
+
+  PageInfo?: {
+    startCursor?: LoaderResolver<
+      Maybe<Scalars["String"]>,
+      PageInfo,
+      {},
+      TContext
+    >;
+    endCursor?: LoaderResolver<
+      Maybe<Scalars["String"]>,
+      PageInfo,
+      {},
+      TContext
+    >;
+    hasNextPage?: LoaderResolver<Scalars["Boolean"], PageInfo, {}, TContext>;
+    hasPreviousPage?: LoaderResolver<
+      Scalars["Boolean"],
+      PageInfo,
+      {},
+      TContext
+    >;
+  };
+
+  MovieEdge?: {
+    cursor?: LoaderResolver<Scalars["ID"], MovieEdge, {}, TContext>;
+    node?: LoaderResolver<Maybe<Movie>, MovieEdge, {}, TContext>;
+  };
+
+  MovieConnection?: {
+    edges?: LoaderResolver<Array<MovieEdge>, MovieConnection, {}, TContext>;
+    pageInfo?: LoaderResolver<PageInfo, MovieConnection, {}, TContext>;
+  };
+}
 declare module "mercurius" {
   interface IResolvers
     extends Resolvers<import("mercurius").MercuriusContext> {}

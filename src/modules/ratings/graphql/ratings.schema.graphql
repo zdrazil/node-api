@@ -1,0 +1,9 @@
+type Rating {
+  id: ID!
+  movie: Movie!
+  rating: Int!
+}
+
+type Query {
+  myRatings: [Rating!]!
+}
