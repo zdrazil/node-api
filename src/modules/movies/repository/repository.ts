@@ -15,6 +15,7 @@ import {
   getMovieBySlug,
   getMovieCount,
   getMovieGenres,
+  hasPreviousMoviePage,
   movieExists,
   updateMovie,
 } from './movies.queries';
@@ -300,29 +301,31 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
 
   async function getAllWithCursor({
     after,
-    first,
+    first = 0,
     sortDirection: sortDirection,
     sortField,
     title,
     userId,
     year,
   }: {
-    after?: string;
+    after?: string | null;
     cancellationToken: boolean;
-    first: number;
-    sortDirection?: SortDirection;
-    sortField?: SortField;
-    title?: string;
-    userId?: string;
-    year?: number;
+    first: number | null;
+    sortDirection?: SortDirection | null;
+    sortField?: SortField | null;
+    title?: string | null;
+    userId?: string | null;
+    year?: number | null;
   }) {
     const client = await db();
     await client.connect();
 
+    const firstPlusOne = first + 1;
+
     const result = await getAllMoviesWithCursor.run(
       {
         after,
-        first,
+        first: firstPlusOne,
         sort_column: sortField,
         sort_direction: sortDirection,
         title,
@@ -332,9 +335,41 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
       client,
     );
 
+    const firstMovie = result[0];
+    const lastMovie = result[result.length - 1];
+    const hasPreviousPage =
+      firstMovie != null
+        ? (
+            await hasPreviousMoviePage.run(
+              {
+                before: firstMovie.id,
+                sort_column: sortField,
+                sort_direction: sortDirection,
+                title,
+                user_id: userId,
+                year_of_release: year,
+              },
+              client,
+            )
+          ).length > 0
+        : (
+            await getMovieCount.run(
+              {
+                title,
+                year_of_release: year,
+              },
+              client,
+            )
+          ).length > 0;
+
     await client.end();
 
-    return result.map(
+    const requestedMovies = result.slice(0, first);
+    const lasRequestedMovie = requestedMovies[requestedMovies.length - 1];
+
+    const hasNextPage = result.length > first;
+
+    const nodes = result.map(
       (movie): Movie => ({
         ...objectToCamel(movie),
         genres: movie.genres?.split(',') ?? [],
@@ -342,6 +377,23 @@ export function createMovieRepository({ db }: { db: () => Promise<Client> }) {
         userRating: movie.user_rating,
       }),
     );
+
+    const edges = nodes.map((node) => ({
+      cursor: node.id,
+      node,
+    }));
+
+    const pageInfo = {
+      endCursor: lasRequestedMovie?.id !== after ? lasRequestedMovie?.id : null,
+      hasNextPage,
+      hasPreviousPage,
+      startCursor: firstMovie?.id,
+    };
+
+    return {
+      edges,
+      pageInfo,
+    };
   }
 
   return {

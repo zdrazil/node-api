@@ -43,7 +43,7 @@ export function createMovieResolvers({
           }
         })();
 
-        const movies = await moviesService.getAllWithCursor({
+        const result = await moviesService.getAllWithCursor({
           after,
           cancellationToken,
           first,
@@ -54,18 +54,7 @@ export function createMovieResolvers({
           year: year,
         });
 
-        const firstMovie = movies[0];
-        const lastMovie = movies[movies.length - 1];
-
-        return {
-          edges: movies,
-          pageInfo: {
-            endCursor: lastMovie?.id,
-            hasNextPage: false,
-            hasPreviousPage: false,
-            startCursor: first,
-          },
-        };
+        return result;
       },
     },
   };

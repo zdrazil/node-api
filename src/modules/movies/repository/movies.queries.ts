@@ -526,3 +526,85 @@ const getAllMoviesWithCursorIR: any = {"usedParamSet":{"user_id":true,"title":tr
 export const getAllMoviesWithCursor = new PreparedQuery<IGetAllMoviesWithCursorParams,IGetAllMoviesWithCursorResult>(getAllMoviesWithCursorIR);
 
 
+/** 'HasPreviousMoviePage' parameters type */
+export interface IHasPreviousMoviePageParams {
+  before?: string | null | void;
+  sort_column?: string | null | void;
+  sort_direction?: string | null | void;
+  title?: string | null | void;
+  user_id?: string | null | void;
+  year_of_release?: number | null | void;
+}
+
+/** 'HasPreviousMoviePage' return type */
+export interface IHasPreviousMoviePageResult {
+  genres: string | null;
+  id: string;
+  rating: string | null;
+  slug: string;
+  title: string;
+  user_rating: number;
+  year_of_release: number;
+}
+
+/** 'HasPreviousMoviePage' query type */
+export interface IHasPreviousMoviePageQuery {
+  params: IHasPreviousMoviePageParams;
+  result: IHasPreviousMoviePageResult;
+}
+
+const hasPreviousMoviePageIR: any = {"usedParamSet":{"user_id":true,"title":true,"year_of_release":true,"before":true,"sort_column":true,"sort_direction":true},"params":[{"name":"user_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":315,"b":322}]},{"name":"title","required":false,"transform":{"type":"scalar"},"locs":[{"a":331,"b":336},{"a":380,"b":385}]},{"name":"year_of_release","required":false,"transform":{"type":"scalar"},"locs":[{"a":401,"b":416},{"a":458,"b":473}]},{"name":"before","required":false,"transform":{"type":"scalar"},"locs":[{"a":481,"b":487},{"a":517,"b":523}]},{"name":"sort_column","required":false,"transform":{"type":"scalar"},"locs":[{"a":628,"b":639},{"a":754,"b":765},{"a":882,"b":893},{"a":1017,"b":1028}]},{"name":"sort_direction","required":false,"transform":{"type":"scalar"},"locs":[{"a":667,"b":681},{"a":793,"b":807},{"a":920,"b":934},{"a":1055,"b":1069}]}],"statement":"SELECT\n    m.*,\n    string_agg(DISTINCT g.name, ',') AS genres,\n    round(avg(r.rating), 1) AS rating,\n    myr.rating AS user_rating\nFROM\n    movies m\n    LEFT JOIN genres g ON m.id = g.movie_id\n    LEFT JOIN ratings r ON m.id = r.movie_id\n    LEFT JOIN ratings myr ON m.id = myr.movie_id\n        AND myr.user_id = :user_id\nWHERE (:title::text IS NULL\n    OR m.title LIKE ('%' || :title || '%'))\nAND (:year_of_release::int IS NULL\n    OR m.year_of_release = :year_of_release)\nAND (:before::uuid IS NULL\n    OR m.id < :before)\nGROUP BY\n    id,\n    user_rating,\n    m.title,\n    m.year_of_release\nORDER BY\n    (\n        CASE WHEN :sort_column = 'title'\n            AND :sort_direction = 'asc' THEN\n            m.title\n        END) ASC,\n(\n        CASE WHEN :sort_column = 'title'\n            AND :sort_direction = 'desc' THEN\n            m.title\n        END) DESC,\n(\n        CASE WHEN :sort_column = 'year'\n            AND :sort_direction = 'asc' THEN\n            m.year_of_release\n        END) ASC,\n(\n        CASE WHEN :sort_column = 'year'\n            AND :sort_direction = 'desc' THEN\n            m.year_of_release\n        END) DESC,\n    m.id ASC\nLIMIT 1"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT
+ *     m.*,
+ *     string_agg(DISTINCT g.name, ',') AS genres,
+ *     round(avg(r.rating), 1) AS rating,
+ *     myr.rating AS user_rating
+ * FROM
+ *     movies m
+ *     LEFT JOIN genres g ON m.id = g.movie_id
+ *     LEFT JOIN ratings r ON m.id = r.movie_id
+ *     LEFT JOIN ratings myr ON m.id = myr.movie_id
+ *         AND myr.user_id = :user_id
+ * WHERE (:title::text IS NULL
+ *     OR m.title LIKE ('%' || :title || '%'))
+ * AND (:year_of_release::int IS NULL
+ *     OR m.year_of_release = :year_of_release)
+ * AND (:before::uuid IS NULL
+ *     OR m.id < :before)
+ * GROUP BY
+ *     id,
+ *     user_rating,
+ *     m.title,
+ *     m.year_of_release
+ * ORDER BY
+ *     (
+ *         CASE WHEN :sort_column = 'title'
+ *             AND :sort_direction = 'asc' THEN
+ *             m.title
+ *         END) ASC,
+ * (
+ *         CASE WHEN :sort_column = 'title'
+ *             AND :sort_direction = 'desc' THEN
+ *             m.title
+ *         END) DESC,
+ * (
+ *         CASE WHEN :sort_column = 'year'
+ *             AND :sort_direction = 'asc' THEN
+ *             m.year_of_release
+ *         END) ASC,
+ * (
+ *         CASE WHEN :sort_column = 'year'
+ *             AND :sort_direction = 'desc' THEN
+ *             m.year_of_release
+ *         END) DESC,
+ *     m.id ASC
+ * LIMIT 1
+ * ```
+ */
+export const hasPreviousMoviePage = new PreparedQuery<IHasPreviousMoviePageParams,IHasPreviousMoviePageResult>(hasPreviousMoviePageIR);
+
+
